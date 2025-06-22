@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class PlayerController : MonoBehaviour
     public bool IsGrounded { get; private set; }
     public Vector2 Velocity => rb.velocity;
 
+    public event System.Action OnAttack;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -31,13 +34,14 @@ public class PlayerController : MonoBehaviour
             enabled = false;
             return;
         }
-
+        input.Player.Attack.performed += HandleAttack;
         input.Player.Jump.performed += HandleJump;
     }
 
     private void OnDestroy()
     {
         input.Player.Jump.performed -= HandleJump;
+        input.Player.Attack.performed -= HandleAttack;
     }
 
     private void Update()
@@ -57,6 +61,13 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
+    }
+
+    private void HandleAttack(InputAction.CallbackContext context)
+    {
+        // Call animation
+        // Damage logic will be handled later
+        OnAttack?.Invoke();
     }
 
     private bool CheckGrounded()

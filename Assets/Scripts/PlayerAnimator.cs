@@ -1,14 +1,26 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerAnimator : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [SerializeField] private PlayerController playerController;
     private SpriteRenderer spriteRenderer;
+    private InputSystem_Actions input;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        input = InputManager.GetInputActions();
+
+        if (playerController != null)
+            playerController.OnAttack += TriggerAttackAnim;
+    }
+
+    private void OnDestroy()
+    {
+        if (playerController != null)
+            playerController.OnAttack -= TriggerAttackAnim;
     }
 
     private void Update()
@@ -23,5 +35,10 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetFloat("MoveX", Mathf.Abs(move.x));
         animator.SetFloat("YVelocity", velocity.y);
         animator.SetBool("IsGrounded", isGrounded);
+    }
+
+    private void TriggerAttackAnim()
+    {
+        animator.SetTrigger("Attack");
     }
 }
