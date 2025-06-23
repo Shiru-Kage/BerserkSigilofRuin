@@ -89,7 +89,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
 
         rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
 
-        if (Vector2.Distance(rb.position, target) < 0.2f && IsGrounded)
+        if (Vector2.Distance(rb.position, target) < 0.5f && IsGrounded)
         {
             rb.velocity = Vector2.zero;
             waiting = true;
