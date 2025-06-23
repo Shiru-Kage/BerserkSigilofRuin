@@ -1939,7 +1939,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 18, y: 2}
+  m_Size: {x: 18, y: 1.6}
   m_EdgeRadius: 0
 --- !u!61 &1003071236
 BoxCollider2D:
@@ -1984,7 +1984,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 14, y: 3}
+  m_Size: {x: 14, y: 2.7}
   m_EdgeRadius: 0
 --- !u!61 &1003071237
 BoxCollider2D:
@@ -2029,7 +2029,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 6, y: 4}
+  m_Size: {x: 6, y: 3.6}
   m_EdgeRadius: 0
 --- !u!1 &1036049937
 GameObject:
@@ -2068,7 +2068,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   patrolDirection: {x: 1, y: 0}
-  patrolDistance: 8.5
+  patrolDistance: 4.5
   moveSpeed: 5
   waitTimeAtEdge: 0
   jumpForce: 8
@@ -2248,7 +2248,7 @@ Transform:
   m_GameObject: {fileID: 1036049937}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.34, y: -0.4, z: 0}
+  m_LocalPosition: {x: -5.27, y: -3.56, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3264,9 +3264,10 @@ GameObject:
   - component: {fileID: 7878350319867326369}
   - component: {fileID: 7878350319867326373}
   - component: {fileID: 7878350319867326368}
-  - component: {fileID: 7878350319867326371}
   - component: {fileID: 7878350319867326375}
   - component: {fileID: 7878350319867326376}
+  - component: {fileID: 7878350319867326371}
+  - component: {fileID: 7878350319867326377}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -3360,11 +3361,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 8
   jumpForce: 8
+  groundCheckOffset: {x: 0, y: 0.6}
+  groundCheckRadius: 0.15
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  groundCheckSize: {x: 0.5, y: 0.1}
-  groundCheckOffset: {x: 0, y: 0.6}
 --- !u!61 &7878350319867326373
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3446,6 +3447,25 @@ MonoBehaviour:
   animator: {fileID: 1160356261264612698}
   spriteRenderer: {fileID: 3626916397349437558}
   characterSource: {fileID: 7878350319867326371}
+--- !u!114 &7878350319867326377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969460406834251770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 409dc53055f6da745a8f0a246011c776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackCooldown: 0.5
+  attackDamage: 10
+  attackRange: 0.4
+  attackOffset: {x: 0.5, y: 1.5}
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

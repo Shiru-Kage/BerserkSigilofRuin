@@ -1,6 +1,7 @@
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using System;
+
 public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 {
     [Header("Movement Settings")]
@@ -8,9 +9,9 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     [SerializeField] private float jumpForce = 12f;
 
     [Header("Ground Check Settings")]
+    [SerializeField] private Vector2 groundCheckOffset = new(0f, -0.6f);
+    [SerializeField] private float groundCheckRadius = 0.15f;
     [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private Vector2 groundCheckSize = new Vector2(0.5f, 0.1f);
-    [SerializeField] private Vector2 groundCheckOffset = Vector2.zero;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -20,7 +21,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     public bool IsGrounded { get; private set; }
     public Vector2 Velocity => rb.velocity;
 
-    public event System.Action OnAttack;
+    public event Action OnAttack;
 
     private void Awake()
     {
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
             enabled = false;
             return;
         }
+
         input.Player.Attack.performed += HandleAttack;
         input.Player.Jump.performed += HandleJump;
     }
@@ -65,22 +67,19 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 
     private void HandleAttack(InputAction.CallbackContext context)
     {
-        // Call animation
-        // Damage logic will be handled later
         OnAttack?.Invoke();
     }
 
     private bool CheckGrounded()
     {
         Vector2 origin = (Vector2)transform.position + groundCheckOffset;
-        return Physics2D.OverlapBox(origin, groundCheckSize, 0f, groundLayer);
+        return Physics2D.OverlapCircle(origin, groundCheckRadius, groundLayer);
     }
 
     private void OnDrawGizmosSelected()
     {
         Vector2 origin = (Vector2)transform.position + groundCheckOffset;
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(origin, groundCheckSize);
+        Gizmos.DrawWireSphere(origin, groundCheckRadius);
     }
 }
-
