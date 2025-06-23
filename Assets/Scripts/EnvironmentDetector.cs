@@ -1,4 +1,3 @@
-// Updated EnvironmentDetector.cs for center-pivot characters
 using UnityEngine;
 
 public class EnvironmentDetector : MonoBehaviour
@@ -9,6 +8,13 @@ public class EnvironmentDetector : MonoBehaviour
 
     [SerializeField] private Vector2 obstacleRayOffset = new(0.3f, 0.5f);
     [SerializeField] private Vector2 ledgeRayOffset = new(0.3f, 0.1f);
+
+    [Header("Obstacle Ray Settings")]
+    [Tooltip("How many horizontal rays are cast upwards to detect obstacles.")]
+    [SerializeField, Range(1, 10)] private int obstacleRayCount = 3;
+
+    [Tooltip("Vertical spacing between each horizontal obstacle ray.")]
+    [SerializeField] private float obstacleRaySpacing = 0.25f;
 
     [Header("Detection Settings")]
     [SerializeField] private Vector2 detectionRayOffset = new(0.5f, 0.5f);
@@ -36,16 +42,26 @@ public class EnvironmentDetector : MonoBehaviour
         float dirX = Mathf.Sign(direction.x);
         if (dirX == 0) dirX = 1f;
 
-        Vector2 obstacleOrigin = feetPosition + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y);
+        bool obstacleDetected = false;
+
+        // Multi-ray obstacle detection (from feet upward)
+        for (int i = 0; i < obstacleRayCount; i++)
+        {
+            Vector2 rayOrigin = feetPosition + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y + i * obstacleRaySpacing);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, obstacleRayLength, obstacleLayer);
+            Debug.DrawRay(rayOrigin, Vector2.right * dirX * obstacleRayLength, Color.magenta);
+
+            if (hit.collider != null)
+            {
+                obstacleDetected = true;
+                break;
+            }
+        }
+
+        // Ledge detection (unchanged)
         Vector2 ledgeOrigin = feetPosition + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
-
-        RaycastHit2D hitObstacle = Physics2D.Raycast(obstacleOrigin, Vector2.right * dirX, obstacleRayLength, obstacleLayer);
         RaycastHit2D hitLedge = Physics2D.Raycast(ledgeOrigin, Vector2.down, ledgeRayLength, groundLayer);
-
-        bool obstacleDetected = hitObstacle.collider != null;
         bool ledgeDetected = hitLedge.collider == null;
-
-        Debug.DrawRay(obstacleOrigin, Vector2.right * dirX * obstacleRayLength, Color.magenta);
         Debug.DrawRay(ledgeOrigin, Vector2.down * ledgeRayLength, Color.cyan);
 
         return obstacleDetected || ledgeDetected;
@@ -88,16 +104,22 @@ public class EnvironmentDetector : MonoBehaviour
         float dirX = transform.localScale.x >= 0 ? 1f : -1f;
 
         Vector2 feetPosition = (Vector2)transform.position + Vector2.down * GetComponent<Collider2D>().bounds.extents.y;
-        Vector2 obstacleOrigin = feetPosition + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y);
-        Vector2 ledgeOrigin = feetPosition + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
         Vector2 detectOrigin = (Vector2)transform.position + detectionRayOffset;
 
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawLine(obstacleOrigin, obstacleOrigin + Vector2.right * dirX * obstacleRayLength);
+        // Draw multiple horizontal obstacle rays
+        for (int i = 0; i < obstacleRayCount; i++)
+        {
+            Vector2 rayOrigin = feetPosition + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y + i * obstacleRaySpacing);
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawLine(rayOrigin, rayOrigin + Vector2.right * dirX * obstacleRayLength);
+        }
 
+        // Ledge detection ray
+        Vector2 ledgeOrigin = feetPosition + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(ledgeOrigin, ledgeOrigin + Vector2.down * ledgeRayLength);
 
+        // Target detection ray
         Gizmos.color = Color.red;
         Gizmos.DrawLine(detectOrigin, detectOrigin + Vector2.right * detectionRange);
     }

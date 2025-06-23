@@ -1,4 +1,3 @@
-// Updated EnemyController.cs to handle Center Pivot
 using UnityEngine;
 using System;
 
@@ -188,11 +187,23 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
 
     private void OnDrawGizmosSelected()
     {
-        if (!Application.isPlaying) return;
+        if (!Application.isPlaying)
+        {
+            Vector2 currentFeet = transform.position + Vector3.down * GetComponent<Collider2D>().bounds.extents.y;
+            Vector2 previewPointA = currentFeet;
+            Vector2 previewPointB = previewPointA + patrolDirection.normalized * patrolDistance;
+
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(previewPointA, previewPointB);
+            Gizmos.DrawWireSphere(previewPointA, 0.1f);
+            Gizmos.DrawWireSphere(previewPointB, 0.1f);
+            return;
+        }
 
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(pointA, pointB);
         Gizmos.DrawWireSphere(pointA, 0.1f);
         Gizmos.DrawWireSphere(pointB, 0.1f);
     }
+
 }
