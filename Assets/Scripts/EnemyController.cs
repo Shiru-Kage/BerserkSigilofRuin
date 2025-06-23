@@ -130,7 +130,12 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         {
             _moveInput = Vector2.zero;
             rb.velocity = new Vector2(0f, rb.velocity.y);
-            OnAttack?.Invoke();
+
+            if (characterAttack != null && Time.time - characterAttack.LastAttackTime >= characterAttack.AttackCooldown)
+            {
+                OnAttack?.Invoke();
+            }
+
             return;
         }
 
@@ -140,12 +145,12 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         TryJump(direction);
 
         float horizontalSpeed = direction.x * moveSpeed;
-
         if (IsGrounded || Mathf.Abs(direction.x) > 0.1f)
         {
             rb.velocity = new Vector2(horizontalSpeed, rb.velocity.y);
         }
     }
+
 
     private void TryJump(Vector2 direction)
     {

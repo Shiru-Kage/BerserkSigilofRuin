@@ -1,13 +1,17 @@
 using UnityEngine;
+using System.Collections;
 
 public class CharacterAttack : MonoBehaviour
 {
     [Header("Attack Settings")]
     [SerializeField] private float attackCooldown = 0.5f;
+    [SerializeField] private float attackDelay = 0.25f;
     [SerializeField] private int attackDamage = 1;
     [SerializeField] private float attackRange = 0.5f;
     [SerializeField] private Vector2 attackOffset = new Vector2(0.5f, 0f);
     [SerializeField] private LayerMask targetLayers;
+    public float LastAttackTime => lastAttackTime;
+    public float AttackCooldown => attackCooldown;
 
     private float lastAttackTime;
     private SpriteRenderer spriteRenderer;
@@ -16,8 +20,6 @@ public class CharacterAttack : MonoBehaviour
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null)
-            Debug.LogWarning("CharacterAttack: SpriteRenderer not found. Flip detection won't work.");
 
         characterData = GetComponent<ICharacterAnimatorData>();
         if (characterData != null)
@@ -29,8 +31,14 @@ public class CharacterAttack : MonoBehaviour
         if (Time.time - lastAttackTime < attackCooldown)
             return;
 
-        PerformAttack();
         lastAttackTime = Time.time;
+        StartCoroutine(DelayedAttack());
+    }
+
+    private IEnumerator DelayedAttack()
+    {
+        yield return new WaitForSeconds(attackDelay);
+        PerformAttack();
     }
 
     private void PerformAttack()
@@ -48,20 +56,17 @@ public class CharacterAttack : MonoBehaviour
         }
     }
 
+    public bool CanAttack()
+    {
+        return Time.time - lastAttackTime >= attackCooldown;
+    }
+    
     private void OnDrawGizmosSelected()
     {
-        if (!Application.isPlaying)
-        {
-            Vector2 previewPos = (Vector2)transform.position + attackOffset;
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(previewPos, attackRange);
-        }
-        else
-        {
-            Vector2 direction = spriteRenderer != null && spriteRenderer.flipX ? Vector2.left : Vector2.right;
-            Vector2 attackPos = (Vector2)transform.position + new Vector2(attackOffset.x * direction.x, attackOffset.y);
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(attackPos, attackRange);
-        }
+        Vector2 direction = Application.isPlaying && spriteRenderer != null && spriteRenderer.flipX ? Vector2.left : Vector2.right;
+        Vector2 attackPos = (Vector2)transform.position + new Vector2(attackOffset.x * direction.x, attackOffset.y);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPos, attackRange);
     }
 }

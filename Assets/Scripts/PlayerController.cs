@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     private Collider2D col;
     private InputSystem_Actions input;
 
+    private CharacterAttack characterAttack;
+
     public Vector2 MoveInput { get; private set; }
     public bool IsGrounded { get; private set; }
     public Vector2 Velocity => rb.velocity;
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
+        characterAttack = GetComponent<CharacterAttack>();
 
         input = InputManager.GetInputActions();
         if (input == null)
@@ -67,7 +70,10 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 
     private void HandleAttack(InputAction.CallbackContext context)
     {
-        OnAttack?.Invoke();
+        if (characterAttack != null && characterAttack.CanAttack())
+        {
+            OnAttack?.Invoke();
+        }
     }
 
     private bool CheckGrounded()
