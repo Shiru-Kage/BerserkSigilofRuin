@@ -1,3 +1,4 @@
+// Updated EnvironmentDetector.cs for center-pivot characters
 using UnityEngine;
 
 public class EnvironmentDetector : MonoBehaviour
@@ -7,7 +8,7 @@ public class EnvironmentDetector : MonoBehaviour
     [SerializeField] private float ledgeRayLength = 1f;
 
     [SerializeField] private Vector2 obstacleRayOffset = new(0.3f, 0.5f);
-    [SerializeField] private Vector2 ledgeRayOffset = new(0.3f, 0f);
+    [SerializeField] private Vector2 ledgeRayOffset = new(0.3f, 0.1f);
 
     [Header("Detection Settings")]
     [SerializeField] private Vector2 detectionRayOffset = new(0.5f, 0.5f);
@@ -24,20 +25,19 @@ public class EnvironmentDetector : MonoBehaviour
     private Transform lastSeenTarget;
     private float loseTimer;
 
-    public bool IsGrounded()
+    public bool IsGrounded(Vector2 feetPosition)
     {
-        Vector2 origin = (Vector2)transform.position + Vector2.down * 0.1f;
         Vector2 size = new(0.4f, 0.05f);
-        return Physics2D.OverlapBox(origin, size, 0f, groundLayer);
+        return Physics2D.OverlapBox(feetPosition, size, 0f, groundLayer);
     }
 
-    public bool ShouldJump(Vector2 direction)
+    public bool ShouldJump(Vector2 direction, Vector2 feetPosition)
     {
         float dirX = Mathf.Sign(direction.x);
         if (dirX == 0) dirX = 1f;
 
-        Vector2 obstacleOrigin = (Vector2)transform.position + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y);
-        Vector2 ledgeOrigin = (Vector2)transform.position + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
+        Vector2 obstacleOrigin = feetPosition + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y);
+        Vector2 ledgeOrigin = feetPosition + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
 
         RaycastHit2D hitObstacle = Physics2D.Raycast(obstacleOrigin, Vector2.right * dirX, obstacleRayLength, obstacleLayer);
         RaycastHit2D hitLedge = Physics2D.Raycast(ledgeOrigin, Vector2.down, ledgeRayLength, groundLayer);
@@ -87,8 +87,9 @@ public class EnvironmentDetector : MonoBehaviour
     {
         float dirX = transform.localScale.x >= 0 ? 1f : -1f;
 
-        Vector2 obstacleOrigin = (Vector2)transform.position + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y);
-        Vector2 ledgeOrigin = (Vector2)transform.position + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
+        Vector2 feetPosition = (Vector2)transform.position + Vector2.down * GetComponent<Collider2D>().bounds.extents.y;
+        Vector2 obstacleOrigin = feetPosition + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y);
+        Vector2 ledgeOrigin = feetPosition + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
         Vector2 detectOrigin = (Vector2)transform.position + detectionRayOffset;
 
         Gizmos.color = Color.magenta;

@@ -75,7 +75,7 @@ ScriptedImporter:
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
-    defaultPivotAlignment: 7
+    defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
     spritePadding: 0
     generateModelPrefab: 1
@@ -87,7 +87,7 @@ ScriptedImporter:
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
-    defaultPivotAlignment: 7
+    defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
     spritePadding: 0
     generateModelPrefab: 1
@@ -95,7 +95,7 @@ ScriptedImporter:
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 0
+  platformSettingsDirtyTick: 638863329192389444
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -121,7 +121,7 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: Jump-All_Frame_0
     originalName: 
-    pivot: {x: 0.5714286, y: 0}
+    pivot: {x: 0.5714286, y: 0.9411765}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -141,7 +141,7 @@ ScriptedImporter:
     uvTransform: {x: 84, y: 210}
   - name: Jump-All_Frame_1
     originalName: 
-    pivot: {x: 0.6, y: 0}
+    pivot: {x: 0.6, y: 0.8}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -161,7 +161,7 @@ ScriptedImporter:
     uvTransform: {x: 84, y: 53}
   - name: Jump-All_Frame_2
     originalName: 
-    pivot: {x: 0.86956525, y: -0.01754386}
+    pivot: {x: 0.86956525, y: 0.54385966}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -181,7 +181,7 @@ ScriptedImporter:
     uvTransform: {x: 127, y: 4}
   - name: Jump-All_Frame_3
     originalName: 
-    pivot: {x: 0.8181819, y: -0.033898305}
+    pivot: {x: 0.8181819, y: 0.5084746}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -201,7 +201,7 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 4}
   - name: Jump-All_Frame_4
     originalName: 
-    pivot: {x: 0.8181819, y: -0.07017544}
+    pivot: {x: 0.8181819, y: 0.49122807}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -221,7 +221,7 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 71}
   - name: Jump-All_Frame_5
     originalName: 
-    pivot: {x: 0.80645156, y: -0.090909086}
+    pivot: {x: 0.80645156, y: 0.49090907}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -241,7 +241,7 @@ ScriptedImporter:
     uvTransform: {x: 45, y: 4}
   - name: Jump-All_Frame_6
     originalName: 
-    pivot: {x: 0.8000001, y: -0.03508772}
+    pivot: {x: 0.8000001, y: 0.5263158}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -261,7 +261,7 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 136}
   - name: Jump-All_Frame_7
     originalName: 
-    pivot: {x: 0.79310346, y: -0.036363635}
+    pivot: {x: 0.79310346, y: 0.5454545}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -281,7 +281,7 @@ ScriptedImporter:
     uvTransform: {x: 45, y: 67}
   - name: Jump-All_Frame_8
     originalName: 
-    pivot: {x: 0.8275862, y: -0.09615385}
+    pivot: {x: 0.8275862, y: 0.5192308}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -301,7 +301,7 @@ ScriptedImporter:
     uvTransform: {x: 45, y: 130}
   - name: Jump-All_Frame_9
     originalName: 
-    pivot: {x: 0.8518519, y: -0.11764707}
+    pivot: {x: 0.8518519, y: 0.50980395}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -321,7 +321,7 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 201}
   - name: Jump-All_Frame_10
     originalName: 
-    pivot: {x: 0.79999995, y: -0.094339624}
+    pivot: {x: 0.79999995, y: 0.509434}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -341,7 +341,7 @@ ScriptedImporter:
     uvTransform: {x: 84, y: 149}
   - name: Jump-All_Frame_11
     originalName: 
-    pivot: {x: 0.80769235, y: -0.07692308}
+    pivot: {x: 0.80769235, y: 0.53846157}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -361,7 +361,7 @@ ScriptedImporter:
     uvTransform: {x: 45, y: 190}
   - name: Jump-All_Frame_12
     originalName: 
-    pivot: {x: 0.76, y: -0.020833334}
+    pivot: {x: 0.76, y: 0.6458334}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -381,7 +381,7 @@ ScriptedImporter:
     uvTransform: {x: 158, y: 4}
   - name: Jump-All_Frame_13
     originalName: 
-    pivot: {x: 0.5714286, y: 0}
+    pivot: {x: 0.5714286, y: 0.7804878}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -401,7 +401,7 @@ ScriptedImporter:
     uvTransform: {x: 84, y: 4}
   - name: Jump-All_Frame_14
     originalName: 
-    pivot: {x: 0.5714286, y: 0}
+    pivot: {x: 0.5714286, y: 0.8}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
@@ -550,7 +550,43 @@ ScriptedImporter:
       spriteId: c6522e4ed3fce564989dd4c459df20a0
     linkedCells: []
     parentIndex: -1
-  platformSettings: []
+  platformSettings:
+  - name: DefaultTexturePlatform
+    overridden: 0
+    ignorePlatformSupport: 0
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
+  - name: Standalone
+    overridden: 0
+    ignorePlatformSupport: 0
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
+  - name: Server
+    overridden: 0
+    ignorePlatformSupport: 0
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
   secondarySpriteTextures: []
   spritePackingTag: 
   canvasSize: {x: 64, y: 64}

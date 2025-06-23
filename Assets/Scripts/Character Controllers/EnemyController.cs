@@ -1,3 +1,4 @@
+// Updated EnemyController.cs to handle Center Pivot
 using UnityEngine;
 using System;
 
@@ -22,6 +23,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
     private bool isChasing = false;
 
     private Rigidbody2D rb;
+    private Collider2D col;
     private EnvironmentDetector detector;
 
     private Vector2 pointA;
@@ -38,7 +40,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
 
     public Vector2 MoveInput => _moveInput;
     public Vector2 Velocity => rb.velocity;
-    public bool IsGrounded => detector.IsGrounded();
+    public bool IsGrounded => detector.IsGrounded(FeetPosition);
 
     private CharacterAttack characterAttack;
     public event Action OnAttack;
@@ -46,12 +48,13 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        col = GetComponent<Collider2D>();
         detector = GetComponent<EnvironmentDetector>();
         characterAttack = GetComponent<CharacterAttack>();
 
-        Vector2 start = rb.position;
+        Vector2 start = FeetPosition;
         pointA = start;
-        pointB = start + patrolDirection.normalized * patrolDistance;
+        pointB = pointA + patrolDirection.normalized * patrolDistance;
         patrolTarget = pointB;
     }
 
@@ -101,7 +104,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
             return;
         }
 
-        Vector2 direction = patrolTarget - rb.position;
+        Vector2 direction = patrolTarget - FeetPosition;
         direction.y = 0f;
         direction.Normalize();
 
@@ -110,7 +113,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
 
         rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
 
-        float horizontalDistance = Mathf.Abs(patrolTarget.x - rb.position.x);
+        float horizontalDistance = Mathf.Abs(patrolTarget.x - FeetPosition.x);
         if (horizontalDistance < patrolArrivalThreshold && IsGrounded)
         {
             rb.velocity = Vector2.zero;
@@ -151,10 +154,9 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         }
     }
 
-
     private void TryJump(Vector2 direction)
     {
-        bool shouldJump = detector.ShouldJump(direction);
+        bool shouldJump = detector.ShouldJump(direction, FeetPosition);
 
         if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f)
         {
@@ -182,14 +184,15 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         enabled = false;
     }
 
+    private Vector2 FeetPosition => rb.position + Vector2.down * col.bounds.extents.y;
+
     private void OnDrawGizmosSelected()
     {
-        Vector2 start = Application.isPlaying ? pointA : (Vector2)transform.position;
-        Vector2 end = start + patrolDirection.normalized * patrolDistance;
+        if (!Application.isPlaying) return;
 
         Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(start, end);
-        Gizmos.DrawWireSphere(start, 0.1f);
-        Gizmos.DrawWireSphere(end, 0.1f);
+        Gizmos.DrawLine(pointA, pointB);
+        Gizmos.DrawWireSphere(pointA, 0.1f);
+        Gizmos.DrawWireSphere(pointB, 0.1f);
     }
 }
