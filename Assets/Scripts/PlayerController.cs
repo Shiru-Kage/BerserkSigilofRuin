@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 {
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 6f;
