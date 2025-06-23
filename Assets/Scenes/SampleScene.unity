@@ -2048,6 +2048,7 @@ GameObject:
   - component: {fileID: 1036049938}
   - component: {fileID: 1036049945}
   - component: {fileID: 1036049946}
+  - component: {fileID: 1036049947}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
@@ -2068,11 +2069,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   patrolDirection: {x: 1, y: 0}
-  patrolDistance: 4.5
-  moveSpeed: 5
+  patrolDistance: 8
+  moveSpeed: 3
   waitTimeAtEdge: 0.5
+  patrolArrivalThreshold: 0.05
   jumpForce: 8
   jumpCooldown: 0.2
+  stoppingDistance: 1.4
+  chaseMemoryDuration: 2
 --- !u!114 &1036049939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2154,7 +2158,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 3
+  m_GravityScale: 2
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -2248,7 +2252,7 @@ Transform:
   m_GameObject: {fileID: 1036049937}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.27, y: -3.56, z: 0}
+  m_LocalPosition: {x: -5.23, y: -0.2, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2283,14 +2287,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obstacleRayLength: 1
   ledgeRayLength: 1
-  obstacleRayOffset: {x: 1, y: 1}
+  obstacleRayOffset: {x: 0.5, y: 1}
   ledgeRayOffset: {x: 0.6, y: 1}
+  detectionRayOffset: {x: 0.5, y: 1}
+  detectionRange: 3
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 64
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 264
+  loseInterestDelay: 2
+--- !u!114 &1036049947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036049937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 409dc53055f6da745a8f0a246011c776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackCooldown: 0.5
+  attackDamage: 10
+  attackRange: 1
+  attackOffset: {x: 0.5, y: 1.5}
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &1075132521
 GameObject:
   m_ObjectHideFlags: 0
@@ -2753,7 +2782,7 @@ Transform:
   m_GameObject: {fileID: 1625186766}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.69, y: -2.68, z: 0}
+  m_LocalPosition: {x: -4.63, y: 0.53, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
