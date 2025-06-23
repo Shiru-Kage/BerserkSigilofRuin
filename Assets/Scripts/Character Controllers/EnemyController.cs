@@ -87,39 +87,57 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
     }
 
     private void PatrolUpdate()
+{
+    if (waiting)
     {
-        if (waiting)
+        waitTimer -= Time.deltaTime;
+        if (waitTimer <= 0f)
         {
-            waitTimer -= Time.deltaTime;
-            if (waitTimer <= 0f)
-            {
-                waiting = false;
-                patrolTarget = (patrolTarget == pointA) ? pointB : pointA;
-                patrolDirection = -patrolDirection;
-            }
-
-            _moveInput = Vector2.zero;
-            rb.velocity = Vector2.zero;
-            return;
+            waiting = false;
+            patrolTarget = (patrolTarget == pointA) ? pointB : pointA;
+            patrolDirection = -patrolDirection;
         }
 
-        Vector2 direction = patrolTarget - FeetPosition;
-        direction.y = 0f;
-        direction.Normalize();
-
-        _moveInput = direction;
-        TryJump(direction);
-
-        rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
-
-        float horizontalDistance = Mathf.Abs(patrolTarget.x - FeetPosition.x);
-        if (horizontalDistance < patrolArrivalThreshold && IsGrounded)
-        {
-            rb.velocity = Vector2.zero;
-            waiting = true;
-            waitTimer = waitTimeAtEdge;
-        }
+        _moveInput = Vector2.zero;
+        rb.velocity = Vector2.zero;
+        return;
     }
+
+    Vector2 direction = patrolTarget - FeetPosition;
+    direction.y = 0f;
+    direction.Normalize();
+
+    bool shouldJump = detector.ShouldJump(direction, FeetPosition);
+
+    // STOP and jump before hitting the obstacle
+    if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f)
+    {
+        _moveInput = Vector2.zero;
+        rb.velocity = Vector2.zero;
+        Jump(); // jump immediately
+        hasJumped = true;
+        jumpCooldownTimer = jumpCooldown;
+        return; // don't move this frame
+    }
+
+    // Reset jump if grounded and no longer needing to jump
+    if (IsGrounded && !shouldJump)
+    {
+        hasJumped = false;
+    }
+
+    _moveInput = direction;
+    rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
+
+    float horizontalDistance = Mathf.Abs(patrolTarget.x - FeetPosition.x);
+    if (horizontalDistance < patrolArrivalThreshold && IsGrounded)
+    {
+        rb.velocity = Vector2.zero;
+        waiting = true;
+        waitTimer = waitTimeAtEdge;
+    }
+}
+
 
     private void ChaseLogic()
     {
@@ -152,7 +170,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
             rb.velocity = new Vector2(horizontalSpeed, rb.velocity.y);
         }
     }
-
+    
     private void TryJump(Vector2 direction)
     {
         bool shouldJump = detector.ShouldJump(direction, FeetPosition);

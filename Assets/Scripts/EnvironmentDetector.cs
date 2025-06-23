@@ -8,6 +8,7 @@ public class EnvironmentDetector : MonoBehaviour
 
     [SerializeField] private Vector2 obstacleRayOffset = new(0.3f, 0.5f);
     [SerializeField] private Vector2 ledgeRayOffset = new(0.3f, 0.1f);
+    
 
     [Header("Obstacle Ray Settings")]
     [Tooltip("How many horizontal rays are cast upwards to detect obstacles.")]
