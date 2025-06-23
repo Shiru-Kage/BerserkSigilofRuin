@@ -175,6 +175,13 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         jumpCooldownTimer = jumpCooldown;
     }
 
+    public void Disable()
+    {
+        _moveInput = Vector2.zero;
+        rb.velocity = Vector2.zero;
+        enabled = false;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Vector2 start = Application.isPlaying ? pointA : (Vector2)transform.position;

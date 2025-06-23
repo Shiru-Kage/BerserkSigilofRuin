@@ -6,6 +6,7 @@ public class Health : MonoBehaviour
     [Header("Health Settings")]
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private bool destroyOnDeath = true;
+    [SerializeField] private float deathDelay = 1.0f;
 
     public int MaxHealth => maxHealth;
     public int CurrentHealth { get; private set; }
@@ -16,11 +17,14 @@ public class Health : MonoBehaviour
     public HealthEvents Events { get => events; set => events = value; }
 
     private bool _isDead;
+    private ICharacterAnimatorData animatorData;
 
     private void Awake()
     {
         CurrentHealth = maxHealth;
         _isDead = false;
+
+        animatorData = GetComponent<ICharacterAnimatorData>();
     }
 
     public void TakeDamage(int amount)
@@ -32,14 +36,26 @@ public class Health : MonoBehaviour
         {
             CurrentHealth = 0;
             _isDead = true;
+
             events.onDeath?.Invoke();
+            if (animatorData is MonoBehaviour mb)
+            {
+                var animator = mb.GetComponent<CharacterAnimator>();
+                animator?.SendMessage("TriggerDeath", SendMessageOptions.DontRequireReceiver);
+            }
+
             if (destroyOnDeath)
-                Destroy(gameObject);
+                Invoke(nameof(DestroySelf), deathDelay);
         }
         else
         {
             events.onTakeDamage?.Invoke();
         }
+    }
+
+    private void DestroySelf()
+    {
+        Destroy(gameObject);
     }
 
     public void Heal(int amount)
@@ -49,13 +65,7 @@ public class Health : MonoBehaviour
         CurrentHealth = Mathf.Min(CurrentHealth + amount, maxHealth);
     }
 
-    public void Kill()
-    {
-        if (!_isDead)
-            TakeDamage(CurrentHealth);
-    }
-
-    public void RestoreFullHealth()
+    public void RestoreFullHealth() //Future Implementation
     {
         if (!_isDead)
             CurrentHealth = maxHealth;

@@ -15,15 +15,21 @@ public class CharacterAnimator : MonoBehaviour
         data = characterSource as ICharacterAnimatorData;
 
         if (data != null)
+        {
             data.OnAttack += TriggerAttack;
+        }
         else
+        {
             Debug.LogError($"{characterSource} does not implement ICharacterAnimatorData.");
+        }
     }
 
     private void OnDestroy()
     {
         if (data != null)
+        {
             data.OnAttack -= TriggerAttack;
+        }
     }
 
     private void Update()
@@ -45,5 +51,10 @@ public class CharacterAnimator : MonoBehaviour
     private void TriggerAttack()
     {
         animator.SetTrigger("Attack");
+    }
+
+    public void TriggerDeath()
+    {
+        animator.SetTrigger("Dead");
     }
 }

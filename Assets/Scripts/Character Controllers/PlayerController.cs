@@ -22,7 +22,6 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     public Vector2 MoveInput { get; private set; }
     public bool IsGrounded { get; private set; }
     public Vector2 Velocity => rb.velocity;
-
     public event Action OnAttack;
 
     private void Awake()
@@ -80,6 +79,12 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     {
         Vector2 origin = (Vector2)transform.position + groundCheckOffset;
         return Physics2D.OverlapCircle(origin, groundCheckRadius, groundLayer);
+    }
+
+    public void OnCharacterDeath()
+    {
+        input.Disable();
+        rb.velocity = Vector2.zero;
     }
 
     private void OnDrawGizmosSelected()
