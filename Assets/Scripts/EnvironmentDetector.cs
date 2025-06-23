@@ -5,8 +5,8 @@ public class EnvironmentDetector : MonoBehaviour
     [Header("Raycast Settings")]
     [SerializeField] private float obstacleRayLength = 1f;
     [SerializeField] private float ledgeRayLength = 1f;
-    [SerializeField] private Vector2 obstacleRayOffset = new Vector2(0.3f, 1f);
-    [SerializeField] private Vector2 ledgeRayOffset = new Vector2(0.3f, -0.1f);
+    [SerializeField] private Vector2 obstacleRayOffset = new(0.3f, 0.5f);
+    [SerializeField] private Vector2 ledgeRayOffset = new(0.3f, 0f);
 
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask obstacleLayer;
@@ -14,7 +14,7 @@ public class EnvironmentDetector : MonoBehaviour
     public bool IsGrounded()
     {
         Vector2 origin = (Vector2)transform.position + Vector2.down * 0.1f;
-        Vector2 size = new Vector2(0.4f, 0.05f);
+        Vector2 size = new(0.4f, 0.05f);
         return Physics2D.OverlapBox(origin, size, 0f, groundLayer);
     }
 
@@ -53,5 +53,4 @@ public class EnvironmentDetector : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(ledgeOrigin, ledgeOrigin + Vector2.down * ledgeRayLength);
     }
-
 }

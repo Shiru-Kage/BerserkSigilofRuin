@@ -75,8 +75,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         _moveInput = direction;
 
         bool shouldJump = detector.ShouldJump(direction);
-
-        if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f)
+        if (!waiting && IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f)
         {
             Jump();
             hasJumped = true;
@@ -90,10 +89,9 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
 
         rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
 
-        if (Vector2.Distance(rb.position, target) < 0.05f)
+        if (Vector2.Distance(rb.position, target) < 0.2f && IsGrounded)
         {
             rb.velocity = Vector2.zero;
-            rb.MovePosition(target);
             waiting = true;
             waitTimer = waitTimeAtEdge;
         }

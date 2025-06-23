@@ -303,7 +303,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!156049354 &50708182
 Grid:
   m_ObjectHideFlags: 0
@@ -2070,7 +2070,7 @@ MonoBehaviour:
   patrolDirection: {x: 1, y: 0}
   patrolDistance: 4.5
   moveSpeed: 5
-  waitTimeAtEdge: 0
+  waitTimeAtEdge: 0.5
   jumpForce: 8
   jumpCooldown: 0.2
 --- !u!114 &1036049939
@@ -2164,7 +2164,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!95 &1036049942
 Animator:
@@ -2283,7 +2283,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obstacleRayLength: 1
   ledgeRayLength: 1
-  obstacleRayOffset: {x: 0, y: 1}
+  obstacleRayOffset: {x: 1, y: 1}
   ledgeRayOffset: {x: 0.6, y: 1}
   groundLayer:
     serializedVersion: 2
@@ -2646,7 +2646,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!61 &1625186767
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2753,7 +2753,7 @@ Transform:
   m_GameObject: {fileID: 1625186766}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.51, y: 0.61, z: 0}
+  m_LocalPosition: {x: -2.69, y: -2.68, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
