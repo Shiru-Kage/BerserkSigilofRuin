@@ -1,5 +1,7 @@
+using System.Security.AccessControl;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections;
 
 public class Health : MonoBehaviour
 {
@@ -16,8 +18,14 @@ public class Health : MonoBehaviour
     [SerializeField] private HealthEvents events;
     public HealthEvents Events { get => events; set => events = value; }
 
+    [Header("Health Drain Settings")]
+    [SerializeField] private int drainAmount = 1;
+    [SerializeField] private float drainInterval = 1f;
+
     private bool _isDead;
     private ICharacterAnimatorData animatorData;
+
+    private Coroutine _drainCoroutine;
 
     private void Awake()
     {
@@ -69,6 +77,37 @@ public class Health : MonoBehaviour
     {
         if (!_isDead)
             CurrentHealth = maxHealth;
+    }
+
+    public void StartHealthDrain(int drainAmount, float interval)
+    {
+        if (_drainCoroutine != null)
+            StopCoroutine(_drainCoroutine);
+
+        _drainCoroutine = StartCoroutine(DrainHealthOverTime(drainAmount, interval));
+    }
+
+    public void StartHealthDrainFromEvent()
+    {
+        StartHealthDrain(drainAmount, drainInterval);
+    }
+
+    public void StopHealthDrain()
+    {
+        if (_drainCoroutine != null)
+        {
+            StopCoroutine(_drainCoroutine);
+            _drainCoroutine = null;
+        }
+    }
+
+    private IEnumerator DrainHealthOverTime(int drainAmount, float interval)
+    {
+        while (!_isDead)
+        {
+            TakeDamage(drainAmount);
+            yield return new WaitForSeconds(interval);
+        }
     }
 }
 

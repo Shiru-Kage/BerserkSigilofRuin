@@ -1551,6 +1551,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  drainAmount: 1
+  drainInterval: 1
 --- !u!61 &737212656
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2802,6 +2804,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  drainAmount: 1
+  drainInterval: 1
 --- !u!61 &1036049940
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3695,10 +3699,34 @@ MonoBehaviour:
   berserkHpDrainPerSecond: 5
   onEnterBerserk:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7878350319867326375}
+        m_TargetAssemblyTypeName: Health, Assembly-CSharp
+        m_MethodName: StartHealthDrainFromEvent
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onExitBerserk:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7878350319867326375}
+        m_TargetAssemblyTypeName: Health, Assembly-CSharp
+        m_MethodName: StopHealthDrain
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1518279277
 GameObject:
   m_ObjectHideFlags: 0
@@ -5023,6 +5051,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  drainAmount: 5
+  drainInterval: 1
 --- !u!114 &7878350319867326376
 MonoBehaviour:
   m_ObjectHideFlags: 0
