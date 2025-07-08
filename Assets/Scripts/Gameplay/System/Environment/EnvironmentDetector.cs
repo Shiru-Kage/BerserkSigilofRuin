@@ -45,7 +45,6 @@ public class EnvironmentDetector : MonoBehaviour
 
         bool obstacleDetected = false;
 
-        // Multi-ray obstacle detection (from feet upward)
         for (int i = 0; i < obstacleRayCount; i++)
         {
             Vector2 rayOrigin = feetPosition + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y + i * obstacleRaySpacing);
@@ -59,14 +58,33 @@ public class EnvironmentDetector : MonoBehaviour
             }
         }
 
-        // Ledge detection (unchanged)
         Vector2 ledgeOrigin = feetPosition + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
         RaycastHit2D hitLedge = Physics2D.Raycast(ledgeOrigin, Vector2.down, ledgeRayLength, groundLayer);
-        bool ledgeDetected = hitLedge.collider == null;
         Debug.DrawRay(ledgeOrigin, Vector2.down * ledgeRayLength, Color.cyan);
+
+        bool ledgeDetected = hitLedge.collider == null || hitLedge.distance > ledgeRayLength * 0.9f;
 
         return obstacleDetected || ledgeDetected;
     }
+
+    public bool IsObstacleInFront(Vector2 direction, Vector2 feetPosition)
+    {
+        float dirX = Mathf.Sign(direction.x);
+        if (dirX == 0) dirX = 1f;
+
+        for (int i = 0; i < obstacleRayCount; i++)
+        {
+            Vector2 rayOrigin = feetPosition + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y + i * obstacleRaySpacing);
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, obstacleRayLength, obstacleLayer);
+            Debug.DrawRay(rayOrigin, Vector2.right * dirX * obstacleRayLength, Color.green);
+
+            if (hit.collider != null)
+                return true;
+        }
+
+        return false;
+    }
+
 
     public Transform GetTarget(Vector2 fallbackDirection)
     {

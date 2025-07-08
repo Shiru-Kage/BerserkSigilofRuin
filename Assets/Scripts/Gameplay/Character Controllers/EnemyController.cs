@@ -18,10 +18,6 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
     [SerializeField] private float stoppingDistance = 0.5f;
     [SerializeField] private float chaseMemoryDuration = 2f;
 
-    [Header("Stuck Detection")]
-    [SerializeField] private float stuckThreshold = 0.05f;
-    [SerializeField] private float maxStuckDuration = 0.5f;
-
     private float chaseTimer = 0f;
     private bool isChasing = false;
 
@@ -40,7 +36,6 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
     private bool hasJumped = false;
 
     private Transform currentTarget;
-
     private Vector2 lastPosition;
     private float stuckTimer = 0f;
 
@@ -120,7 +115,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
 
         bool shouldJump = detector.ShouldJump(direction, FeetPosition);
 
-        if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f)
+        if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f && Mathf.Abs(rb.velocity.y) < 0.01f)
         {
             _moveInput = Vector2.zero;
             rb.velocity = Vector2.zero;
@@ -130,7 +125,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
             return;
         }
 
-        if (IsGrounded && !shouldJump)
+        if (IsGrounded && rb.velocity.y <= 0.1f && !shouldJump)
         {
             hasJumped = false;
         }
@@ -183,14 +178,14 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
     {
         bool shouldJump = detector.ShouldJump(direction, FeetPosition);
 
-        if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f)
+        if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f && Mathf.Abs(rb.velocity.y) < 0.01f)
         {
             Jump();
             hasJumped = true;
             jumpCooldownTimer = jumpCooldown;
         }
 
-        if (IsGrounded && !shouldJump)
+        if (IsGrounded && rb.velocity.y <= 0.1f && !shouldJump)
         {
             hasJumped = false;
         }
@@ -204,13 +199,24 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
 
     private void CheckStuck()
     {
+        Vector2 forwardDirection = isChasing && currentTarget != null
+            ? ((Vector2)currentTarget.position - rb.position).normalized
+            : patrolDirection.normalized;
+
+        if (!detector.IsObstacleInFront(forwardDirection, FeetPosition))
+        {
+            stuckTimer = 0f;
+            lastPosition = rb.position;
+            return;
+        }
+
         float distanceMoved = Vector2.Distance(rb.position, lastPosition);
 
-        if (distanceMoved < stuckThreshold && IsGrounded)
+        if (distanceMoved < 0.05f && IsGrounded)
         {
             stuckTimer += Time.deltaTime;
 
-            if (stuckTimer > maxStuckDuration && jumpCooldownTimer <= 0f)
+            if (stuckTimer > 0.5f && jumpCooldownTimer <= 0f)
             {
                 Debug.Log("Enemy is stuck, trying to jump.");
                 Jump();
