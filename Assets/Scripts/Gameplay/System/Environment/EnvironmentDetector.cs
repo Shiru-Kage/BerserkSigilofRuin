@@ -107,7 +107,6 @@ public class EnvironmentDetector : MonoBehaviour
         Vector2 feetPosition = (Vector2)transform.position + Vector2.down * GetComponent<Collider2D>().bounds.extents.y;
         Vector2 detectOrigin = (Vector2)transform.position + detectionRayOffset;
 
-        // Draw multiple horizontal obstacle rays
         for (int i = 0; i < obstacleRayCount; i++)
         {
             Vector2 rayOrigin = feetPosition + new Vector2(obstacleRayOffset.x * dirX, obstacleRayOffset.y + i * obstacleRaySpacing);
@@ -115,12 +114,10 @@ public class EnvironmentDetector : MonoBehaviour
             Gizmos.DrawLine(rayOrigin, rayOrigin + Vector2.right * dirX * obstacleRayLength);
         }
 
-        // Ledge detection ray
         Vector2 ledgeOrigin = feetPosition + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
+        
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(ledgeOrigin, ledgeOrigin + Vector2.down * ledgeRayLength);
-
-        // Target detection ray
         Gizmos.color = Color.red;
         Gizmos.DrawLine(detectOrigin, detectOrigin + Vector2.right * detectionRange);
     }

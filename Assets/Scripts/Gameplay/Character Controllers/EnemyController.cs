@@ -18,6 +18,10 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
     [SerializeField] private float stoppingDistance = 0.5f;
     [SerializeField] private float chaseMemoryDuration = 2f;
 
+    [Header("Stuck Detection")]
+    [SerializeField] private float stuckThreshold = 0.05f;
+    [SerializeField] private float maxStuckDuration = 0.5f;
+
     private float chaseTimer = 0f;
     private bool isChasing = false;
 
@@ -37,6 +41,9 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
 
     private Transform currentTarget;
 
+    private Vector2 lastPosition;
+    private float stuckTimer = 0f;
+
     public Vector2 MoveInput => _moveInput;
     public Vector2 Velocity => rb.velocity;
     public bool IsGrounded => detector.IsGrounded(FeetPosition);
@@ -55,6 +62,8 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         pointA = start;
         pointB = pointA + patrolDirection.normalized * patrolDistance;
         patrolTarget = pointB;
+
+        lastPosition = rb.position;
     }
 
     private void Update()
@@ -84,60 +93,59 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
             ChaseLogic();
         else
             PatrolUpdate();
+
+        CheckStuck();
     }
 
     private void PatrolUpdate()
-{
-    if (waiting)
     {
-        waitTimer -= Time.deltaTime;
-        if (waitTimer <= 0f)
+        if (waiting)
         {
-            waiting = false;
-            patrolTarget = (patrolTarget == pointA) ? pointB : pointA;
-            patrolDirection = -patrolDirection;
+            waitTimer -= Time.deltaTime;
+            if (waitTimer <= 0f)
+            {
+                waiting = false;
+                patrolTarget = (patrolTarget == pointA) ? pointB : pointA;
+                patrolDirection = -patrolDirection;
+            }
+
+            _moveInput = Vector2.zero;
+            rb.velocity = Vector2.zero;
+            return;
         }
 
-        _moveInput = Vector2.zero;
-        rb.velocity = Vector2.zero;
-        return;
+        Vector2 direction = patrolTarget - FeetPosition;
+        direction.y = 0f;
+        direction.Normalize();
+
+        bool shouldJump = detector.ShouldJump(direction, FeetPosition);
+
+        if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f)
+        {
+            _moveInput = Vector2.zero;
+            rb.velocity = Vector2.zero;
+            Jump();
+            hasJumped = true;
+            jumpCooldownTimer = jumpCooldown;
+            return;
+        }
+
+        if (IsGrounded && !shouldJump)
+        {
+            hasJumped = false;
+        }
+
+        _moveInput = direction;
+        rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
+
+        float horizontalDistance = Mathf.Abs(patrolTarget.x - FeetPosition.x);
+        if (horizontalDistance < patrolArrivalThreshold && IsGrounded)
+        {
+            rb.velocity = Vector2.zero;
+            waiting = true;
+            waitTimer = waitTimeAtEdge;
+        }
     }
-
-    Vector2 direction = patrolTarget - FeetPosition;
-    direction.y = 0f;
-    direction.Normalize();
-
-    bool shouldJump = detector.ShouldJump(direction, FeetPosition);
-
-    // STOP and jump before hitting the obstacle
-    if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f)
-    {
-        _moveInput = Vector2.zero;
-        rb.velocity = Vector2.zero;
-        Jump(); // jump immediately
-        hasJumped = true;
-        jumpCooldownTimer = jumpCooldown;
-        return; // don't move this frame
-    }
-
-    // Reset jump if grounded and no longer needing to jump
-    if (IsGrounded && !shouldJump)
-    {
-        hasJumped = false;
-    }
-
-    _moveInput = direction;
-    rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
-
-    float horizontalDistance = Mathf.Abs(patrolTarget.x - FeetPosition.x);
-    if (horizontalDistance < patrolArrivalThreshold && IsGrounded)
-    {
-        rb.velocity = Vector2.zero;
-        waiting = true;
-        waitTimer = waitTimeAtEdge;
-    }
-}
-
 
     private void ChaseLogic()
     {
@@ -170,7 +178,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
             rb.velocity = new Vector2(horizontalSpeed, rb.velocity.y);
         }
     }
-    
+
     private void TryJump(Vector2 direction)
     {
         bool shouldJump = detector.ShouldJump(direction, FeetPosition);
@@ -192,6 +200,30 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
     {
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         jumpCooldownTimer = jumpCooldown;
+    }
+
+    private void CheckStuck()
+    {
+        float distanceMoved = Vector2.Distance(rb.position, lastPosition);
+
+        if (distanceMoved < stuckThreshold && IsGrounded)
+        {
+            stuckTimer += Time.deltaTime;
+
+            if (stuckTimer > maxStuckDuration && jumpCooldownTimer <= 0f)
+            {
+                Debug.Log("Enemy is stuck, trying to jump.");
+                Jump();
+                hasJumped = true;
+                stuckTimer = 0f;
+            }
+        }
+        else
+        {
+            stuckTimer = 0f;
+        }
+
+        lastPosition = rb.position;
     }
 
     public void Disable()
@@ -223,5 +255,4 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         Gizmos.DrawWireSphere(pointA, 0.1f);
         Gizmos.DrawWireSphere(pointB, 0.1f);
     }
-
 }
