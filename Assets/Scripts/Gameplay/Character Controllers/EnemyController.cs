@@ -20,30 +20,24 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
 
     private float chaseTimer = 0f;
     private bool isChasing = false;
+    private Transform currentTarget;
 
     private Rigidbody2D rb;
     private Collider2D col;
     private EnvironmentDetector detector;
+    private CharacterAttack characterAttack;
 
-    private Vector2 pointA;
-    private Vector2 pointB;
-    private Vector2 patrolTarget;
-    private bool waiting;
-    private float waitTimer;
+    private PatrolBehavior patrolBehavior;
+    private ChaseBehavior chaseBehavior;
+    private StuckHandler stuckHandler;
 
-    private Vector2 _moveInput;
     private float jumpCooldownTimer;
     private bool hasJumped = false;
 
-    private Transform currentTarget;
-    private Vector2 lastPosition;
-    private float stuckTimer = 0f;
-
+    private Vector2 _moveInput;
     public Vector2 MoveInput => _moveInput;
     public Vector2 Velocity => rb.velocity;
     public bool IsGrounded => detector.IsGrounded(FeetPosition);
-
-    private CharacterAttack characterAttack;
     public event Action OnAttack;
 
     private void Awake()
@@ -53,12 +47,19 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         detector = GetComponent<EnvironmentDetector>();
         characterAttack = GetComponent<CharacterAttack>();
 
-        Vector2 start = FeetPosition;
-        pointA = start;
-        pointB = pointA + patrolDirection.normalized * patrolDistance;
-        patrolTarget = pointB;
+        patrolBehavior = new PatrolBehavior(
+            transform,
+            detector,
+            patrolDirection,
+            patrolDistance,
+            waitTimeAtEdge,
+            patrolArrivalThreshold
+        );
 
-        lastPosition = rb.position;
+        chaseBehavior = new ChaseBehavior(detector, characterAttack, stoppingDistance);
+        chaseBehavior.OnAttack += () => OnAttack?.Invoke();
+
+        stuckHandler = new StuckHandler(detector);
     }
 
     private void Update()
@@ -66,7 +67,11 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         if (jumpCooldownTimer > 0f)
             jumpCooldownTimer -= Time.deltaTime;
 
-        Transform detectedTarget = detector.GetTarget(patrolDirection);
+        Vector2 detectionDirection = isChasing && currentTarget != null
+            ? ((Vector2)currentTarget.position - rb.position).normalized
+            : patrolBehavior.DetectionDirection;
+
+        Transform detectedTarget = detector.GetTarget(detectionDirection);
 
         if (detectedTarget != null)
         {
@@ -85,110 +90,37 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         }
 
         if (isChasing && currentTarget != null)
-            ChaseLogic();
+        {
+            Vector2 direction = chaseBehavior.UpdateBehavior(
+                currentTarget.position,
+                rb.position,
+                IsGrounded,
+                CanJump,
+                ref hasJumped,
+                Jump
+            );
+            _moveInput = direction;
+        }
         else
-            PatrolUpdate();
-
-        CheckStuck();
-    }
-
-    private void PatrolUpdate()
-    {
-        if (waiting)
         {
-            waitTimer -= Time.deltaTime;
-            if (waitTimer <= 0f)
-            {
-                waiting = false;
-                patrolTarget = (patrolTarget == pointA) ? pointB : pointA;
-                patrolDirection = -patrolDirection;
-            }
-
-            _moveInput = Vector2.zero;
-            rb.velocity = Vector2.zero;
-            return;
+            Vector2 direction = patrolBehavior.UpdateBehavior(
+                rb.position,
+                FeetPosition,
+                IsGrounded,
+                CanJump,
+                ref hasJumped,
+                Jump
+            );
+            _moveInput = direction;
         }
 
-        Vector2 direction = patrolTarget - FeetPosition;
-        direction.y = 0f;
-        direction.Normalize();
+        rb.velocity = new Vector2(_moveInput.x * moveSpeed, rb.velocity.y);
 
-        bool shouldJump = detector.ShouldJump(direction, FeetPosition);
+        Vector2 forward = isChasing && currentTarget != null
+            ? ((Vector2)currentTarget.position - rb.position).normalized
+            : patrolBehavior.CurrentDirection;
 
-        if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f && Mathf.Abs(rb.velocity.y) < 0.01f)
-        {
-            _moveInput = Vector2.zero;
-            rb.velocity = Vector2.zero;
-            Jump();
-            hasJumped = true;
-            jumpCooldownTimer = jumpCooldown;
-            return;
-        }
-
-        if (IsGrounded && rb.velocity.y <= 0.1f && !shouldJump)
-        {
-            hasJumped = false;
-        }
-
-        _moveInput = direction;
-        rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
-
-        float horizontalDistance = Mathf.Abs(patrolTarget.x - FeetPosition.x);
-        if (horizontalDistance < patrolArrivalThreshold && IsGrounded)
-        {
-            rb.velocity = Vector2.zero;
-            waiting = true;
-            waitTimer = waitTimeAtEdge;
-        }
-    }
-
-    private void ChaseLogic()
-    {
-        if (currentTarget == null) return;
-
-        Vector2 toTarget = (Vector2)currentTarget.position - rb.position;
-        float distance = toTarget.magnitude;
-
-        if (distance <= stoppingDistance)
-        {
-            _moveInput = Vector2.zero;
-            rb.velocity = new Vector2(0f, rb.velocity.y);
-
-            if (characterAttack != null && Time.time - characterAttack.LastAttackTime >= characterAttack.AttackCooldown)
-            {
-                OnAttack?.Invoke();
-            }
-
-            return;
-        }
-
-        Vector2 direction = toTarget.normalized;
-        _moveInput = direction;
-
-        TryJump(direction);
-
-        float horizontalSpeed = direction.x * moveSpeed;
-        if (IsGrounded || Mathf.Abs(direction.x) > 0.1f)
-        {
-            rb.velocity = new Vector2(horizontalSpeed, rb.velocity.y);
-        }
-    }
-
-    private void TryJump(Vector2 direction)
-    {
-        bool shouldJump = detector.ShouldJump(direction, FeetPosition);
-
-        if (IsGrounded && shouldJump && !hasJumped && jumpCooldownTimer <= 0f && Mathf.Abs(rb.velocity.y) < 0.01f)
-        {
-            Jump();
-            hasJumped = true;
-            jumpCooldownTimer = jumpCooldown;
-        }
-
-        if (IsGrounded && rb.velocity.y <= 0.1f && !shouldJump)
-        {
-            hasJumped = false;
-        }
+        stuckHandler.Update(rb.position, IsGrounded, forward, FeetPosition, CanJump, Jump);
     }
 
     private void Jump()
@@ -197,40 +129,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         jumpCooldownTimer = jumpCooldown;
     }
 
-    private void CheckStuck()
-    {
-        Vector2 forwardDirection = isChasing && currentTarget != null
-            ? ((Vector2)currentTarget.position - rb.position).normalized
-            : patrolDirection.normalized;
-
-        if (!detector.IsObstacleInFront(forwardDirection, FeetPosition))
-        {
-            stuckTimer = 0f;
-            lastPosition = rb.position;
-            return;
-        }
-
-        float distanceMoved = Vector2.Distance(rb.position, lastPosition);
-
-        if (distanceMoved < 0.05f && IsGrounded)
-        {
-            stuckTimer += Time.deltaTime;
-
-            if (stuckTimer > 0.5f && jumpCooldownTimer <= 0f)
-            {
-                Debug.Log("Enemy is stuck, trying to jump.");
-                Jump();
-                hasJumped = true;
-                stuckTimer = 0f;
-            }
-        }
-        else
-        {
-            stuckTimer = 0f;
-        }
-
-        lastPosition = rb.position;
-    }
+    private bool CanJump => jumpCooldownTimer <= 0f && Mathf.Abs(rb.velocity.y) < 0.01f;
 
     public void Disable()
     {
@@ -253,12 +152,6 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
             Gizmos.DrawLine(previewPointA, previewPointB);
             Gizmos.DrawWireSphere(previewPointA, 0.1f);
             Gizmos.DrawWireSphere(previewPointB, 0.1f);
-            return;
         }
-
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(pointA, pointB);
-        Gizmos.DrawWireSphere(pointA, 0.1f);
-        Gizmos.DrawWireSphere(pointB, 0.1f);
     }
 }
