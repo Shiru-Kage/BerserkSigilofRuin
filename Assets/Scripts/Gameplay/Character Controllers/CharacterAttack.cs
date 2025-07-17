@@ -10,18 +10,23 @@ public class CharacterAttack : MonoBehaviour
     [SerializeField] private float attackRange = 0.5f;
     [SerializeField] private Vector2 attackOffset = new Vector2(0.5f, 0f);
     [SerializeField] private LayerMask targetLayers;
+
     public float LastAttackTime => lastAttackTime;
     public float AttackCooldown => attackCooldown;
 
     private float lastAttackTime;
     private SpriteRenderer spriteRenderer;
     private ICharacterAnimatorData characterData;
+    private InCombatTracker combatTracker;
+    private RageSystem rageSystem;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-
+        combatTracker = GetComponent<InCombatTracker>();
+        rageSystem = GetComponent<RageSystem>();
         characterData = GetComponent<ICharacterAnimatorData>();
+
         if (characterData != null)
             characterData.OnAttack += TryAttack;
     }
@@ -29,7 +34,9 @@ public class CharacterAttack : MonoBehaviour
     public void TryAttack()
     {
         if (Time.time - lastAttackTime < attackCooldown)
+        {
             return;
+        }
 
         lastAttackTime = Time.time;
         StartCoroutine(DelayedAttack());
@@ -52,6 +59,20 @@ public class CharacterAttack : MonoBehaviour
             if (hit.TryGetComponent(out Health health))
             {
                 health.TakeDamage(attackDamage);
+
+                if (combatTracker != null)
+                {
+                    combatTracker.NotifyCombatActivity();
+                }
+
+                if (rageSystem != null)
+                {
+                    rageSystem.AddRageFromHit();
+                }
+            }
+            else
+            {
+                Debug.Log($"PerformAttack: hit {hit.name} has no Health component.");
             }
         }
     }
@@ -60,7 +81,7 @@ public class CharacterAttack : MonoBehaviour
     {
         return Time.time - lastAttackTime >= attackCooldown;
     }
-    
+
     private void OnDrawGizmosSelected()
     {
         Vector2 direction = Application.isPlaying && spriteRenderer != null && spriteRenderer.flipX ? Vector2.left : Vector2.right;

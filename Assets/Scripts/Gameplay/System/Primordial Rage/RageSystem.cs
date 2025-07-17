@@ -10,6 +10,7 @@ public class RageSystem : MonoBehaviour
     [SerializeField] private float rageIncreaseOnDamage = 10f;
     [SerializeField] private float rageDrainRate = 25f;
     [SerializeField] private bool isBerserk = false;
+
     public float CurrentRage => rage;
     public float MaxRage => rageMax;
 
@@ -22,6 +23,8 @@ public class RageSystem : MonoBehaviour
     [SerializeField] private UnityEvent onEnterBerserk;
     [SerializeField] private UnityEvent onExitBerserk;
 
+    private InCombatTracker combatTracker;
+
     private void Awake()
     {
         if (playerController == null)
@@ -30,23 +33,10 @@ public class RageSystem : MonoBehaviour
         if (playerHealth == null)
             playerHealth = GetComponent<Health>();
 
-        if (playerController != null)
-        {
-            playerController.OnAttack += OnPlayerAttackAttempt;
-        }
+        combatTracker = GetComponent<InCombatTracker>();
 
         if (playerHealth != null)
-        {
             playerHealth.Events.onTakeDamage.AddListener(OnPlayerTakeDamage);
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (playerController != null)
-        {
-            playerController.OnAttack -= OnPlayerAttackAttempt;
-        }
     }
 
     private void Update()
@@ -63,23 +53,6 @@ public class RageSystem : MonoBehaviour
 
     private void CheckThresholds()
     {
-        if (rage >= 25f && rage < 50f)
-        {
-            // optional threshold logic
-        }
-        else if (rage >= 50f && rage < 75f)
-        {
-            // optional threshold logic
-        }
-        else if (rage >= 75f && rage < 90f)
-        {
-            // optional threshold logic
-        }
-        else if (rage >= 90f && rage < 100f)
-        {
-            // optional threshold logic
-        }
-
         if (rage >= rageMax)
         {
             EnterBerserk();
@@ -114,20 +87,23 @@ public class RageSystem : MonoBehaviour
 
     private void AddRage(float amount)
     {
-        if (!isBerserk)
+        if (!isBerserk && combatTracker != null && combatTracker.IsInCombat)
         {
             rage += amount;
             rage = Mathf.Clamp(rage, 0, rageMax);
         }
     }
 
-    private void OnPlayerAttackAttempt()
+    public void AddRageFromHit()
     {
         AddRage(rageIncreasePerHit);
     }
 
     private void OnPlayerTakeDamage()
     {
+        if (combatTracker != null)
+            combatTracker.NotifyCombatActivity();
+
         AddRage(rageIncreaseOnDamage);
     }
 }
