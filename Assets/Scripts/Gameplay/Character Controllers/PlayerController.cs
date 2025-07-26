@@ -77,8 +77,15 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 
     private bool CheckGrounded()
     {
-        Vector2 origin = (Vector2)transform.position + groundCheckOffset;
-        return Physics2D.OverlapCircle(origin, groundCheckRadius, groundLayer);
+        Vector2 origin = (Vector2)transform.position + groundCheckOffset; 
+        Vector2 direction = Vector2.down; 
+
+        float distance = groundCheckRadius; 
+
+        RaycastHit2D hitLeft = Physics2D.Raycast(origin + Vector2.left * 0.5f, direction, distance, groundLayer);
+        RaycastHit2D hitRight = Physics2D.Raycast(origin + Vector2.right * 0.5f, direction, distance, groundLayer);
+
+        return hitLeft.collider != null || hitRight.collider != null;
     }
 
     public void OnCharacterDeath()
@@ -90,7 +97,19 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     private void OnDrawGizmosSelected()
     {
         Vector2 origin = (Vector2)transform.position + groundCheckOffset;
+        Vector2 direction = Vector2.down;
+        float distance = groundCheckRadius; 
+
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(origin, groundCheckRadius);
+
+        Vector2 leftRayOrigin = origin + Vector2.left * 0.5f;
+        Gizmos.DrawLine(leftRayOrigin, leftRayOrigin + direction * distance);
+
+        Vector2 rightRayOrigin = origin + Vector2.right * 0.5f;
+        Gizmos.DrawLine(rightRayOrigin, rightRayOrigin + direction * distance);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(origin, origin + direction * distance);
     }
+
 }
