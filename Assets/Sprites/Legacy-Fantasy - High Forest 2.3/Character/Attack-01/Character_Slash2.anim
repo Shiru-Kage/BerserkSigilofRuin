@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Slash-Attack_Clip
+  m_Name: Character_Slash2
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,15 +21,15 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: -1988312708746006195, guid: a44e09d8f8af566488c065c943feb26c, type: 3}
+      value: {fileID: 202154682977304032, guid: 044b0ad7017eebf4f90fbe01bb952012, type: 3}
     - time: 0.1
-      value: {fileID: -5578013624050157047, guid: a44e09d8f8af566488c065c943feb26c, type: 3}
+      value: {fileID: -1763391525881722549, guid: 044b0ad7017eebf4f90fbe01bb952012, type: 3}
     - time: 0.2
-      value: {fileID: 8019565429533097024, guid: a44e09d8f8af566488c065c943feb26c, type: 3}
+      value: {fileID: 4007974810134123386, guid: 044b0ad7017eebf4f90fbe01bb952012, type: 3}
     - time: 0.3
-      value: {fileID: 5538505594256476051, guid: a44e09d8f8af566488c065c943feb26c, type: 3}
+      value: {fileID: 7004058112858409499, guid: 044b0ad7017eebf4f90fbe01bb952012, type: 3}
     - time: 0.4
-      value: {fileID: 5538505594256476051, guid: a44e09d8f8af566488c065c943feb26c, type: 3}
+      value: {fileID: 7004058112858409499, guid: 044b0ad7017eebf4f90fbe01bb952012, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
