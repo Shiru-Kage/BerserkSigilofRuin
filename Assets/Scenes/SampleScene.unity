@@ -5655,6 +5655,7 @@ GameObject:
   - component: {fileID: 7878350319867326376}
   - component: {fileID: 7878350319867326371}
   - component: {fileID: 7878350319867326377}
+  - component: {fileID: 7878350319867326378}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -5869,6 +5870,24 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 128
+--- !u!114 &7878350319867326378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969460406834251770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18013e69b871fe346b4458d3512fcb56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  comboResetTime: 2
+  maxComboCount: 3
+  attackTriggers:
+  - Attack1
+  - Attack2
+  - Attack3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

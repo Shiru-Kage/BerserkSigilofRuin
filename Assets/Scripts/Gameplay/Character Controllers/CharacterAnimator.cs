@@ -9,14 +9,16 @@ public class CharacterAnimator : MonoBehaviour
     [SerializeField] private MonoBehaviour characterSource;
 
     private ICharacterAnimatorData data;
+    private AttackSequencer comboSystem;
 
     private void Awake()
     {
         data = characterSource as ICharacterAnimatorData;
+        comboSystem = GetComponent<AttackSequencer>(); 
 
         if (data != null)
         {
-            data.OnAttack += TriggerAttack;
+            data.OnAttack += TriggerComboAttack;
         }
         else
         {
@@ -28,7 +30,7 @@ public class CharacterAnimator : MonoBehaviour
     {
         if (data != null)
         {
-            data.OnAttack -= TriggerAttack;
+            data.OnAttack -= TriggerComboAttack;
         }
     }
 
@@ -48,9 +50,28 @@ public class CharacterAnimator : MonoBehaviour
         animator.SetBool("IsGrounded", grounded);
     }
 
-    private void TriggerAttack()
+    private void TriggerComboAttack()
     {
-        animator.SetTrigger("Attack");
+        animator.ResetTrigger("Attack1");
+        animator.ResetTrigger("Attack2");
+        animator.ResetTrigger("Attack3");
+
+        int comboCount = comboSystem.GetCurrentComboCount(); 
+
+        switch (comboCount)
+        {
+            case 1:
+                animator.SetTrigger("Attack1");
+                break;
+            case 2:
+                animator.SetTrigger("Attack2");
+                break;
+            case 3:
+                animator.SetTrigger("Attack3");
+                break;
+            default:
+                break;
+        }
     }
 
     public void TriggerDeath()

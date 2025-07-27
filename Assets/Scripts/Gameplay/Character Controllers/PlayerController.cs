@@ -16,8 +16,9 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     private Rigidbody2D rb;
     private Collider2D col;
     private InputSystem_Actions input;
-
     private CharacterAttack characterAttack;
+    private AttackSequencer comboSystem; 
+    private Animator animator;
 
     public Vector2 MoveInput { get; private set; }
     public bool IsGrounded { get; private set; }
@@ -29,6 +30,8 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         characterAttack = GetComponent<CharacterAttack>();
+        comboSystem = GetComponent<AttackSequencer>(); // Get the AttackSequencer component
+        animator = GetComponent<Animator>();
 
         input = InputManager.GetInputActions();
         if (input == null)
@@ -40,12 +43,18 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 
         input.Player.Attack.performed += HandleAttack;
         input.Player.Jump.performed += HandleJump;
+
+        // Subscribe to the combo attack event
+        comboSystem.OnComboAttack += TriggerComboAttack;
     }
 
     private void OnDestroy()
     {
         input.Player.Jump.performed -= HandleJump;
         input.Player.Attack.performed -= HandleAttack;
+
+        // Unsubscribe from the combo attack event
+        comboSystem.OnComboAttack -= TriggerComboAttack;
     }
 
     private void Update()
@@ -59,19 +68,34 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         rb.velocity = new Vector2(MoveInput.x * moveSpeed, rb.velocity.y);
     }
 
+    public void HandleAttack(InputAction.CallbackContext context)
+    {
+        comboSystem.HandleAttack();
+    }
+
+    private void TriggerComboAttack()
+    {
+        int comboCount = comboSystem.GetCurrentComboCount();
+
+        if (comboCount == 1)
+        {
+            animator.SetTrigger("Attack1"); 
+        }
+        else if (comboCount == 2)
+        {
+            animator.SetTrigger("Attack2");
+        }
+        else if (comboCount == 3)
+        {
+            animator.SetTrigger("Attack3");
+        }
+    }
+
     private void HandleJump(InputAction.CallbackContext context)
     {
         if (IsGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-        }
-    }
-
-    private void HandleAttack(InputAction.CallbackContext context)
-    {
-        if (characterAttack != null && characterAttack.CanAttack())
-        {
-            OnAttack?.Invoke();
         }
     }
 
@@ -111,5 +135,4 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         Gizmos.color = Color.green;
         Gizmos.DrawLine(origin, origin + direction * distance);
     }
-
 }
