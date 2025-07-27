@@ -9,15 +9,16 @@ public class BerserkState : MonoBehaviour
     private bool isInBerserkState = false;
     private bool canAttack = true;
 
-    private Animator animator;
     private CharacterAttack characterAttack;
     private RageSystem rageSystem;
+    private AttackSequencer comboSystem; 
 
     private void Awake()
     {
-        animator = GetComponent<Animator>();
         characterAttack = GetComponent<CharacterAttack>();
         rageSystem = GameObject.FindAnyObjectByType<RageSystem>();
+
+        comboSystem = GetComponent<AttackSequencer>(); 
     }
 
     private void Update()
@@ -35,7 +36,6 @@ public class BerserkState : MonoBehaviour
             }
         }
     }
-
     public void EnterBerserkState()
     {
         isInBerserkState = true;
@@ -64,11 +64,14 @@ public class BerserkState : MonoBehaviour
 
     private void TriggerRandomAttack()
     {
-        animator.SetTrigger("Attack1");
+        if (comboSystem != null)
+        {
+            comboSystem.HandleAttack();
+        }
 
         if (characterAttack != null)
         {
-            characterAttack.TryAttack();
+            characterAttack.TryAttack(); 
         }
     }
 }

@@ -56,7 +56,7 @@ public class CharacterAnimator : MonoBehaviour
         animator.SetFloat("YVelocity", velocity.y);
         animator.SetBool("IsGrounded", grounded);
     }
-    private void TriggerComboAttack()
+    public void TriggerComboAttack()
     {
         if (comboSystem == null)
         {
