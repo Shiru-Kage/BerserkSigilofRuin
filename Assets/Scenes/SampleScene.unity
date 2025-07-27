@@ -5883,7 +5883,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   comboResetTime: 2
-  maxComboCount: 3
+  maxComboCount: 4
   attackTriggers:
   - Attack1
   - Attack2

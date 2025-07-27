@@ -6,7 +6,8 @@ public class AttackSequencer : MonoBehaviour
     [Header("Combo Settings")]
     [SerializeField] private float comboResetTime = 2f;
     [SerializeField] private int maxComboCount = 3;
-    [SerializeField] private string[] attackTriggers; 
+    [SerializeField] private string[] attackTriggers;
+
     private float comboTimer;
     private int currentComboCount = 0;
     private bool isComboActive = false;
@@ -16,19 +17,16 @@ public class AttackSequencer : MonoBehaviour
     private void Update()
     {
         comboTimer -= Time.deltaTime;
-
         if (comboTimer <= 0f && isComboActive)
         {
-            Debug.Log("Combo reset time exceeded. Resetting combo.");
-            ResetCombo();  
+            ResetCombo();
         }
     }
 
     public void HandleAttack()
     {
-        if (comboTimer <= 0f) 
+        if (comboTimer <= 0f)
         {
-            Debug.Log("Combo timer expired. Resetting combo and starting with Attack1.");
             ResetCombo();
         }
 
@@ -36,18 +34,17 @@ public class AttackSequencer : MonoBehaviour
         {
             isComboActive = true;
             currentComboCount = 1;
-            Debug.Log("Starting new combo with Attack1.");
         }
         else
         {
             currentComboCount = Mathf.Min(currentComboCount + 1, maxComboCount);
-            Debug.Log($"Combo incremented to Attack{currentComboCount}.");
         }
 
-        if (attackTriggers.Length >= currentComboCount)
+        int validComboIndex = Mathf.Min(currentComboCount - 1, attackTriggers.Length - 1);
+
+        if (validComboIndex < attackTriggers.Length)
         {
             OnComboAttack?.Invoke();
-            Debug.Log($"Combo attack triggered: {attackTriggers[currentComboCount - 1]}");
         }
 
         comboTimer = comboResetTime;
