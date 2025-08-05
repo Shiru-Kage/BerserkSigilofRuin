@@ -49,8 +49,6 @@ public class PatrolBehavior
                 newDirection.y = 0f;
                 CurrentDirection = newDirection.normalized;
                 lastDirection = CurrentDirection;
-
-                Debug.Log("Patrol flipped. New direction: " + CurrentDirection);
             }
 
             return Vector2.zero;

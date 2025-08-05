@@ -2,35 +2,19 @@ using UnityEngine;
 
 public class EnvironmentDetector : MonoBehaviour
 {
-    [Header("Raycast Settings")]
+    [Header("Obstacle Detection Settings")]
     [SerializeField] private float obstacleRayLength = 1f;
-    [SerializeField] private float ledgeRayLength = 1f;
-
     [SerializeField] private Vector2 obstacleRayOffset = new(0.3f, 0.5f);
-    [SerializeField] private Vector2 ledgeRayOffset = new(0.3f, 0.1f);
-    
-
-    [Header("Obstacle Ray Settings")]
-    [Tooltip("How many horizontal rays are cast upwards to detect obstacles.")]
     [SerializeField, Range(1, 10)] private int obstacleRayCount = 3;
-
-    [Tooltip("Vertical spacing between each horizontal obstacle ray.")]
     [SerializeField] private float obstacleRaySpacing = 0.25f;
 
-    [Header("Detection Settings")]
-    [SerializeField] private Vector2 detectionRayOffset = new(0.5f, 0.5f);
-    [SerializeField] private float detectionRange = 5f;
-    [SerializeField] private LayerMask targetLayer;
+    [Header("Ledge Detection Settings")]
+    [SerializeField] private float ledgeRayLength = 1f;
+    [SerializeField] private Vector2 ledgeRayOffset = new(0.3f, 0.1f);
 
-    [Header("Layers")]
+    [Header("Environment Layers")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask obstacleLayer;
-
-    [Header("Target Memory Settings")]
-    [SerializeField] private float loseInterestDelay = 2f;
-
-    private Transform lastSeenTarget;
-    private float loseTimer;
 
     public bool IsGrounded(Vector2 feetPosition)
     {
@@ -85,45 +69,10 @@ public class EnvironmentDetector : MonoBehaviour
         return false;
     }
 
-
-    public Transform GetTarget(Vector2 fallbackDirection)
-    {
-        Vector2 origin = (Vector2)transform.position + detectionRayOffset;
-        Vector2 direction;
-
-        if (lastSeenTarget != null)
-        {
-            direction = ((Vector2)lastSeenTarget.position - origin).normalized;
-        }
-        else
-        {
-            direction = fallbackDirection.normalized;
-        }
-
-        RaycastHit2D hit = Physics2D.Raycast(origin, direction, detectionRange, targetLayer);
-        Debug.DrawRay(origin, direction * detectionRange, Color.red);
-
-        if (hit.collider != null)
-        {
-            lastSeenTarget = hit.transform;
-            loseTimer = loseInterestDelay;
-        }
-        else
-        {
-            loseTimer -= Time.deltaTime;
-            if (loseTimer <= 0f)
-                lastSeenTarget = null;
-        }
-
-        return lastSeenTarget;
-    }
-
     private void OnDrawGizmosSelected()
     {
         float dirX = transform.localScale.x >= 0 ? 1f : -1f;
-
         Vector2 feetPosition = (Vector2)transform.position + Vector2.down * GetComponent<Collider2D>().bounds.extents.y;
-        Vector2 detectOrigin = (Vector2)transform.position + detectionRayOffset;
 
         for (int i = 0; i < obstacleRayCount; i++)
         {
@@ -133,10 +82,7 @@ public class EnvironmentDetector : MonoBehaviour
         }
 
         Vector2 ledgeOrigin = feetPosition + new Vector2(ledgeRayOffset.x * dirX, ledgeRayOffset.y);
-        
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(ledgeOrigin, ledgeOrigin + Vector2.down * ledgeRayLength);
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(detectOrigin, detectOrigin + Vector2.right * detectionRange);
     }
 }

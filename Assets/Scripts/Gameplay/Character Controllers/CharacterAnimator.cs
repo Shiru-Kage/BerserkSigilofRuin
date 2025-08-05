@@ -1,43 +1,46 @@
 using UnityEngine;
+using System;
 
 public class CharacterAnimator : MonoBehaviour
 {
     [SerializeField] private Animator animator;
+    public Animator Animator => animator;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
     [Header("Animation Data Source")]
     [SerializeField] private MonoBehaviour characterSource;
 
     private ICharacterAnimatorData data;
-    private AttackSequencer comboSystem; 
-    private int lastAttackHash = Animator.StringToHash("Attack1"); 
+    private static readonly int attack1Hash = Animator.StringToHash("Attack1");
+    private static readonly int attack2Hash = Animator.StringToHash("Attack2");
+    private static readonly int attack3Hash = Animator.StringToHash("Attack3");
+
+    private int comboIndex = 1;
+    private Action onAttackAction;
 
     private void Awake()
     {
         data = characterSource as ICharacterAnimatorData;
-        comboSystem = GetComponent<AttackSequencer>(); 
 
         if (data != null)
         {
-            data.OnAttack += TriggerComboAttack;
+            onAttackAction = () =>
+            {
+                TriggerComboAttack();
+            };
+            data.OnAttack += onAttackAction;
         }
         else
         {
             Debug.LogError($"{characterSource} does not implement ICharacterAnimatorData.");
         }
-
-        if (comboSystem == null)
-        {
-            Debug.Log("No AttackSequencer found. Defaulting to Attack1.");
-            animator.SetTrigger("Attack1");
-        }
     }
 
     private void OnDestroy()
     {
-        if (data != null)
+        if (data != null && onAttackAction != null)
         {
-            data.OnAttack -= TriggerComboAttack;
+            data.OnAttack -= onAttackAction;
         }
     }
 
@@ -56,53 +59,68 @@ public class CharacterAnimator : MonoBehaviour
         animator.SetFloat("YVelocity", velocity.y);
         animator.SetBool("IsGrounded", grounded);
     }
+
     public void TriggerComboAttack()
     {
-        if (comboSystem == null)
+        if (!animator.HasParameter(attack2Hash) || !animator.HasParameter(attack3Hash))
         {
-            animator.SetTrigger("Attack1");
+            animator.SetTrigger(attack1Hash);
             return;
         }
 
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-        if (stateInfo.IsName("Attack1") && !stateInfo.IsName("Attack1") && !stateInfo.IsName("Attack2") && !stateInfo.IsName("Attack3"))
-        {
-            Debug.Log("Animation not yet finished. Waiting before next attack.");
-            return;
-        }
 
-        animator.ResetTrigger("Attack1");
-        animator.ResetTrigger("Attack2");
-        animator.ResetTrigger("Attack3");
-
-        int comboCount = comboSystem.GetCurrentComboCount(); 
-
-        switch (comboCount)
+        switch (comboIndex)
         {
             case 1:
-                animator.SetTrigger("Attack1");
-                lastAttackHash = Animator.StringToHash("Attack1");
+                animator.SetTrigger(attack1Hash);
                 break;
             case 2:
-                animator.SetTrigger("Attack2");
-                lastAttackHash = Animator.StringToHash("Attack2");
+                animator.SetTrigger(attack2Hash);
                 break;
             case 3:
-                animator.SetTrigger("Attack3");
-                lastAttackHash = Animator.StringToHash("Attack3");
+                animator.SetTrigger(attack3Hash);
                 break;
             default:
+                animator.SetTrigger(attack1Hash);
                 break;
         }
 
-        if (comboCount == 3)
-        {
-            comboSystem.ResetComboImmediately(); 
-        }
+        comboIndex++;
+        if (comboIndex > 3)
+            comboIndex = 1;
     }
 
     public void TriggerDeath()
     {
         animator.SetTrigger("Dead");
+    }
+
+    public void SetCharacterSource(ICharacterAnimatorData newSource)
+    {
+        if (data != null && onAttackAction != null)
+            data.OnAttack -= onAttackAction;
+
+        data = newSource;
+
+        if (data != null)
+        {
+            onAttackAction = () =>
+            {
+                TriggerComboAttack();
+            };
+            data.OnAttack += onAttackAction;
+        }
+    }
+}
+public static class AnimatorExtensions
+{
+    public static bool HasParameter(this Animator animator, int hash)
+    {
+        foreach (var param in animator.parameters)
+        {
+            if (param.nameHash == hash)
+                return true;
+        }
+        return false;
     }
 }

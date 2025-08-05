@@ -25,7 +25,9 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
     private Rigidbody2D rb;
     private Collider2D col;
     private EnvironmentDetector detector;
+    private PlayerDetector playerDetector;
     private CharacterAttack characterAttack;
+    private AttackSequencer comboSystem;
 
     private PatrolBehavior patrolBehavior;
     private ChaseBehavior chaseBehavior;
@@ -45,7 +47,9 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         detector = GetComponent<EnvironmentDetector>();
+        playerDetector = GetComponent<PlayerDetector>();
         characterAttack = GetComponent<CharacterAttack>();
+        comboSystem = GetComponent<AttackSequencer>();
 
         patrolBehavior = new PatrolBehavior(
             transform,
@@ -71,7 +75,7 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
             ? ((Vector2)currentTarget.position - rb.position).normalized
             : patrolBehavior.DetectionDirection;
 
-        Transform detectedTarget = detector.GetTarget(detectionDirection);
+        Transform detectedTarget = playerDetector.GetTarget(detectionDirection);
 
         if (detectedTarget != null)
         {
@@ -154,4 +158,6 @@ public class EnemyController : MonoBehaviour, ICharacterAnimatorData
             Gizmos.DrawWireSphere(previewPointB, 0.1f);
         }
     }
+
+    public int CurrentComboCount => comboSystem != null ? comboSystem.CurrentComboCount : 1;
 }

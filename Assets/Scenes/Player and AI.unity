@@ -1603,13 +1603,14 @@ GameObject:
   - component: {fileID: 737212654}
   - component: {fileID: 737212652}
   - component: {fileID: 737212651}
+  - component: {fileID: 737212661}
   m_Layer: 7
   m_Name: Enemy 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &737212651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1622,8 +1623,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 409dc53055f6da745a8f0a246011c776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackCooldown: 1
-  attackDelay: 0.25
   attackDamage: 1
   attackRange: 1
   attackOffset: {x: 0.5, y: 0}
@@ -1643,23 +1642,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstacleRayLength: 1
-  ledgeRayLength: 1
   obstacleRayOffset: {x: 0.5, y: 0}
-  ledgeRayOffset: {x: 0, y: 0}
   obstacleRayCount: 5
   obstacleRaySpacing: 0.5
-  detectionRayOffset: {x: 0, y: 0}
-  detectionRange: 3
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 64
+  ledgeRayLength: 1
+  ledgeRayOffset: {x: 0, y: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 264
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 264
-  loseInterestDelay: 2
 --- !u!114 &737212653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1714,7 +1707,19 @@ MonoBehaviour:
   events:
     onTakeDamage:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 1422063664}
+          m_TargetAssemblyTypeName: RageSystem, Assembly-CSharp
+          m_MethodName: AddRageFromHit
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     onDeath:
       m_PersistentCalls:
         m_Calls:
@@ -1893,6 +1898,25 @@ Transform:
   - {fileID: 1382652278}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &737212661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 737212650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eae7ffe2dc529a45a4a409f85038159, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRayOffset: {x: 0.5, y: 0.5}
+  detectionRange: 5
+  detectionRadius: 0
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  loseInterestDelay: 2
 --- !u!1 &740940886
 GameObject:
   m_ObjectHideFlags: 0
@@ -2144,8 +2168,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 409dc53055f6da745a8f0a246011c776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackCooldown: 1
-  attackDelay: 0.25
   attackDamage: 1
   attackRange: 1
   attackOffset: {x: 0.5, y: 0}
@@ -2165,23 +2187,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstacleRayLength: 0.7
-  ledgeRayLength: 1
   obstacleRayOffset: {x: 0.5, y: 0}
-  ledgeRayOffset: {x: 0, y: 0}
   obstacleRayCount: 5
   obstacleRaySpacing: 0.5
-  detectionRayOffset: {x: 0.5, y: 0}
-  detectionRange: 2
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 64
+  ledgeRayLength: 1
+  ledgeRayOffset: {x: 0, y: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 264
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 264
-  loseInterestDelay: 2
 --- !u!114 &966520871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3357,6 +3373,7 @@ GameObject:
   - component: {fileID: 1036049938}
   - component: {fileID: 1036049945}
   - component: {fileID: 1036049946}
+  - component: {fileID: 1036049948}
   - component: {fileID: 1036049947}
   m_Layer: 7
   m_Name: Enemy
@@ -3378,14 +3395,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   patrolDirection: {x: 1, y: 0}
-  patrolDistance: 6
+  patrolDistance: 4
   moveSpeed: 4
   waitTimeAtEdge: 0.5
   patrolArrivalThreshold: 0.05
   jumpForce: 8
   jumpCooldown: 0.2
   stoppingDistance: 1.4
-  chaseMemoryDuration: 1
+  chaseMemoryDuration: 0
 --- !u!114 &1036049939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3404,7 +3421,19 @@ MonoBehaviour:
   events:
     onTakeDamage:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 1422063664}
+          m_TargetAssemblyTypeName: RageSystem, Assembly-CSharp
+          m_MethodName: AddRageFromHit
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     onDeath:
       m_PersistentCalls:
         m_Calls:
@@ -3576,7 +3605,7 @@ Transform:
   m_GameObject: {fileID: 1036049937}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.5, y: -2.66, z: 0}
+  m_LocalPosition: {x: -5.32, y: -1.57, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3611,23 +3640,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obstacleRayLength: 0.7
-  ledgeRayLength: 0
   obstacleRayOffset: {x: 0.5, y: 0.2}
-  ledgeRayOffset: {x: 0, y: 0}
   obstacleRayCount: 5
   obstacleRaySpacing: 0.5
-  detectionRayOffset: {x: 0.5, y: 0}
-  detectionRange: 2
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 64
+  ledgeRayLength: 0
+  ledgeRayOffset: {x: 0, y: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 264
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 264
-  loseInterestDelay: 2
 --- !u!114 &1036049947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3640,14 +3663,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 409dc53055f6da745a8f0a246011c776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackCooldown: 1
-  attackDelay: 0.25
   attackDamage: 1
   attackRange: 1
   attackOffset: {x: 0.5, y: 0}
   targetLayers:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &1036049948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036049937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eae7ffe2dc529a45a4a409f85038159, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRayOffset: {x: 0.5, y: 0.5}
+  detectionRange: 3
+  detectionRadius: 0
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  loseInterestDelay: 2
 --- !u!1 &1075132521
 GameObject:
   m_ObjectHideFlags: 0
@@ -4384,11 +4424,13 @@ MonoBehaviour:
   rageMax: 100
   rageIncreasePerHit: 5
   rageIncreaseOnDamage: 10
-  rageDrainRate: 25
+  rageDrainRate: 1
   isBerserk: 0
   playerController: {fileID: 7878350319867326371}
   playerHealth: {fileID: 7878350319867326375}
-  berserkHpDrainPerSecond: 5
+  berserkState: {fileID: 7878350319867326379}
+  characterAnimator: {fileID: 7878350319867326376}
+  berserkHpDrainPerSecond: 1
   onEnterBerserk:
     m_PersistentCalls:
       m_Calls:
@@ -4406,7 +4448,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 7878350319867326379}
         m_TargetAssemblyTypeName: BerserkState, Assembly-CSharp
-        m_MethodName: EnterBerserkState
+        m_MethodName: EnterBerserk
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5251,7 +5293,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 10
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -5669,6 +5711,8 @@ GameObject:
   - component: {fileID: 7878350319867326377}
   - component: {fileID: 7878350319867326378}
   - component: {fileID: 7878350319867326379}
+  - component: {fileID: 7878350319867326380}
+  - component: {fileID: 7878350319867326381}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -5685,7 +5729,7 @@ Transform:
   m_GameObject: {fileID: 6969460406834251770}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.52, y: -3.51, z: 0}
+  m_LocalPosition: {x: 3.84, y: -2.54, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5824,7 +5868,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cc66ce402550584b9c42ecb94d1ecbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 10000
   destroyOnDeath: 1
   deathDelay: 1
   events:
@@ -5875,9 +5919,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 409dc53055f6da745a8f0a246011c776, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackCooldown: 0.5
-  attackDelay: 0.25
-  attackDamage: 20
+  attackDamage: 1
   attackRange: 1
   attackOffset: {x: 0.5, y: 0}
   targetLayers:
@@ -5896,7 +5938,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   comboResetTime: 2
-  maxComboCount: 4
+  maxComboCount: 3
   attackTriggers:
   - Attack1
   - Attack2
@@ -5913,8 +5955,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8c0a5c6282c9534ea891fd171afcd6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackIntervalFactor: 1.5
-  attackCooldown: 0.5
+  moveSpeed: 5
+  jumpForce: 8
+  barrageTriggerChance: 0.5
+  barrageCheckCooldown: 5
+  spriteRenderer: {fileID: 3626916397349437558}
+--- !u!114 &7878350319867326380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969460406834251770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eae7ffe2dc529a45a4a409f85038159, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRayOffset: {x: 0.5, y: 0.5}
+  detectionRange: 0
+  detectionRadius: 10
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  loseInterestDelay: 0
+--- !u!114 &7878350319867326381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6969460406834251770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d48b09ab5385484ba7be0b47114d768, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstacleRayLength: 0.7
+  obstacleRayOffset: {x: 0.5, y: 0.2}
+  obstacleRayCount: 4
+  obstacleRaySpacing: 0.5
+  ledgeRayLength: 0
+  ledgeRayOffset: {x: 0, y: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 264
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 264
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     [SerializeField] private float groundCheckRadius = 0.15f;
     [SerializeField] private LayerMask groundLayer;
 
+    private bool isInBarrageMode = false;
+
     private Rigidbody2D rb;
     private Collider2D col;
     private InputSystem_Actions input;
@@ -22,6 +24,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     public Vector2 MoveInput { get; private set; }
     public bool IsGrounded { get; private set; }
     public Vector2 Velocity => rb.velocity;
+    public Vector2 FeetPosition => (Vector2)transform.position + groundCheckOffset;
     public event Action OnAttack;
 
     private void Awake()
@@ -43,6 +46,8 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         input.Player.Jump.performed += HandleJump;
 
         comboSystem.OnComboAttack += TriggerComboAttack;
+
+        input.Enable();
     }
 
     private void OnDestroy()
@@ -61,7 +66,10 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 
     private void FixedUpdate()
     {
-        rb.velocity = new Vector2(MoveInput.x * moveSpeed, rb.velocity.y);
+        if (!isInBarrageMode)
+        {
+            rb.velocity = new Vector2(MoveInput.x * moveSpeed, rb.velocity.y);
+        }
     }
 
     public void HandleAttack(InputAction.CallbackContext context)
@@ -69,14 +77,14 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         comboSystem.HandleAttack();
     }
 
-    private void TriggerComboAttack()
+    private void TriggerComboAttack(int comboIndex)
     {
         OnAttack?.Invoke();
     }
 
     private void HandleJump(InputAction.CallbackContext context)
     {
-        if (IsGrounded)
+        if (!isInBarrageMode && IsGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
@@ -84,10 +92,10 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 
     private bool CheckGrounded()
     {
-        Vector2 origin = (Vector2)transform.position + groundCheckOffset; 
-        Vector2 direction = Vector2.down; 
+        Vector2 origin = (Vector2)transform.position + groundCheckOffset;
+        Vector2 direction = Vector2.down;
 
-        float distance = groundCheckRadius; 
+        float distance = groundCheckRadius;
 
         RaycastHit2D hitLeft = Physics2D.Raycast(origin + Vector2.left * 0.5f, direction, distance, groundLayer);
         RaycastHit2D hitRight = Physics2D.Raycast(origin + Vector2.right * 0.5f, direction, distance, groundLayer);
@@ -101,11 +109,21 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         rb.velocity = Vector2.zero;
     }
 
+    public void SetAIMovementOverride(bool isBarrageMode)
+    {
+        isInBarrageMode = isBarrageMode;
+
+        if (isInBarrageMode)
+            input.Disable();
+        else
+            input.Enable();
+    }
+
     private void OnDrawGizmosSelected()
     {
         Vector2 origin = (Vector2)transform.position + groundCheckOffset;
         Vector2 direction = Vector2.down;
-        float distance = groundCheckRadius; 
+        float distance = groundCheckRadius;
 
         Gizmos.color = Color.yellow;
 
@@ -118,4 +136,5 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         Gizmos.color = Color.green;
         Gizmos.DrawLine(origin, origin + direction * distance);
     }
+    public int CurrentComboCount => comboSystem != null ? comboSystem.CurrentComboCount : 1;
 }

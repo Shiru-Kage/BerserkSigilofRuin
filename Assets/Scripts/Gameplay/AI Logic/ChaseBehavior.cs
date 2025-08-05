@@ -5,7 +5,11 @@ public class ChaseBehavior
 {
     private EnvironmentDetector detector;
     private CharacterAttack characterAttack;
+    private Transform currentTarget;
+    private Rigidbody2D rb;
     private float stoppingDistance;
+    public float StoppingDistance => stoppingDistance;
+
 
     public event Action OnAttack;
 
@@ -23,8 +27,7 @@ public class ChaseBehavior
 
         if (distance <= stoppingDistance)
         {
-            if (characterAttack != null && Time.time - characterAttack.LastAttackTime >= characterAttack.AttackCooldown)
-                OnAttack?.Invoke();
+            OnAttack?.Invoke();
             return Vector2.zero;
         }
 
@@ -43,4 +46,21 @@ public class ChaseBehavior
 
         return direction;
     }
+    public void SetTarget(Transform target)
+    {
+        currentTarget = target;
+    }
+
+    public void ClearTarget()
+    {
+        currentTarget = null;
+    }
+
+    public void Stop()
+    {
+        if (rb != null)
+            rb.velocity = Vector2.zero;
+    }
+
+    public bool HasTarget() => currentTarget != null;
 }

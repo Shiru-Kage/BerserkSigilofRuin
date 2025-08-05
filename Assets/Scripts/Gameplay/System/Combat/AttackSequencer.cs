@@ -7,19 +7,24 @@ public class AttackSequencer : MonoBehaviour
     [SerializeField] private float comboResetTime = 2f;
     [SerializeField] private int maxComboCount = 3;
     [SerializeField] private string[] attackTriggers;
+    public int CurrentComboCount => currentComboCount;
 
     private float comboTimer;
     private int currentComboCount = 0;
     private bool isComboActive = false;
 
-    public event Action OnComboAttack;
+    public event Action<int> OnComboAttack;
+    public event Action OnComboFinished; 
 
     private void Update()
     {
-        comboTimer -= Time.deltaTime;
-        if (comboTimer <= 0f && isComboActive)
+        if (isComboActive)
         {
-            ResetCombo();
+            comboTimer -= Time.deltaTime;
+            if (comboTimer <= 0f)
+            {
+                ResetCombo();
+            }
         }
     }
 
@@ -44,7 +49,12 @@ public class AttackSequencer : MonoBehaviour
 
         if (validComboIndex < attackTriggers.Length)
         {
-            OnComboAttack?.Invoke();
+            OnComboAttack?.Invoke(validComboIndex);
+        }
+
+        if (currentComboCount == maxComboCount)
+        {
+            OnComboFinished?.Invoke();
         }
 
         comboTimer = comboResetTime;
@@ -64,5 +74,10 @@ public class AttackSequencer : MonoBehaviour
     public void ResetComboImmediately()
     {
         ResetCombo();
+    }
+
+    public string[] GetAttackTriggers()
+    {
+        return attackTriggers;
     }
 }

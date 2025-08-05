@@ -17,6 +17,8 @@ public class RageSystem : MonoBehaviour
     [Header("References")]
     [SerializeField] private PlayerController playerController;
     [SerializeField] private Health playerHealth;
+    [SerializeField] private BerserkState berserkState;
+    [SerializeField] private CharacterAnimator characterAnimator;
 
     [Header("Berserk Settings")]
     [SerializeField] private float berserkHpDrainPerSecond = 5f;
@@ -32,6 +34,12 @@ public class RageSystem : MonoBehaviour
 
         if (playerHealth == null)
             playerHealth = GetComponent<Health>();
+
+        if (berserkState == null)
+            berserkState = GetComponent<BerserkState>();
+
+        if (characterAnimator == null)
+            characterAnimator = GetComponent<CharacterAnimator>();
 
         combatTracker = GetComponent<InCombatTracker>();
 
@@ -73,6 +81,13 @@ public class RageSystem : MonoBehaviour
     private void EnterBerserk()
     {
         isBerserk = true;
+        berserkState.EnterBerserk();
+
+        if (characterAnimator != null)
+        {
+            characterAnimator.SetCharacterSource(berserkState);
+        }
+
         onEnterBerserk?.Invoke();
         Debug.Log("ENTERED BERSERK");
     }
@@ -81,6 +96,13 @@ public class RageSystem : MonoBehaviour
     {
         isBerserk = false;
         rage = 0;
+        berserkState.ExitBerserk();
+
+        if (characterAnimator != null)
+        {
+            characterAnimator.SetCharacterSource(playerController);
+        }
+
         onExitBerserk?.Invoke();
         Debug.Log("EXITED BERSERK");
     }

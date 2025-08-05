@@ -4,17 +4,10 @@ using System.Collections;
 public class CharacterAttack : MonoBehaviour
 {
     [Header("Attack Settings")]
-    [SerializeField] private float attackCooldown = 0.5f;
-    [SerializeField] private float attackDelay = 0.25f;
     [SerializeField] private int attackDamage = 1;
     [SerializeField] private float attackRange = 0.5f;
     [SerializeField] private Vector2 attackOffset = new Vector2(0.5f, 0f);
     [SerializeField] private LayerMask targetLayers;
-
-    public float LastAttackTime => lastAttackTime;
-    public float AttackCooldown => attackCooldown;
-
-    private float lastAttackTime;
     private SpriteRenderer spriteRenderer;
     private ICharacterAnimatorData characterData;
     private InCombatTracker combatTracker;
@@ -26,26 +19,6 @@ public class CharacterAttack : MonoBehaviour
         combatTracker = GetComponent<InCombatTracker>();
         rageSystem = GetComponent<RageSystem>();
         characterData = GetComponent<ICharacterAnimatorData>();
-
-        if (characterData != null)
-            characterData.OnAttack += TryAttack;
-    }
-
-    public void TryAttack()
-    {
-        if (Time.time - lastAttackTime < attackCooldown)
-        {
-            return;
-        }
-
-        lastAttackTime = Time.time;
-        StartCoroutine(DelayedAttack());
-    }
-
-    private IEnumerator DelayedAttack()
-    {
-        yield return new WaitForSeconds(attackDelay);
-        PerformAttack();
     }
 
     private void PerformAttack()
@@ -77,11 +50,24 @@ public class CharacterAttack : MonoBehaviour
         }
     }
 
-    public bool CanAttack()
+    public bool IsTargetInRange(Transform target)
     {
-        return Time.time - lastAttackTime >= attackCooldown;
+        if (target == null) return false;
+
+        Vector2 direction = spriteRenderer != null && spriteRenderer.flipX ? Vector2.left : Vector2.right;
+        Vector2 attackPos = (Vector2)transform.position + new Vector2(attackOffset.x * direction.x, attackOffset.y);
+
+        float distance = Vector2.Distance(attackPos, target.position);
+        return distance <= attackRange;
     }
 
+    public void ForceAttackNow()
+    {
+        PerformAttack();
+    }
+
+
+    
     private void OnDrawGizmosSelected()
     {
         Vector2 direction = Application.isPlaying && spriteRenderer != null && spriteRenderer.flipX ? Vector2.left : Vector2.right;
