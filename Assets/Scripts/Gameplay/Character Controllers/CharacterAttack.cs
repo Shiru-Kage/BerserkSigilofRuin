@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
+
 
 public class CharacterAttack : MonoBehaviour
 {
     [Header("Attack Settings")]
-    [SerializeField] private int attackDamage = 1;
+    [SerializeField] private CharacterStats characterStats;
     [SerializeField] private float attackRange = 0.5f;
     [SerializeField] private Vector2 attackOffset = new Vector2(0.5f, 0f);
     [SerializeField] private LayerMask targetLayers;
@@ -12,6 +14,8 @@ public class CharacterAttack : MonoBehaviour
     private ICharacterAnimatorData characterData;
     private InCombatTracker combatTracker;
     private RageSystem rageSystem;
+
+    public UnityEvent<string> OnTargetLayerChanged;
 
     private void Awake()
     {
@@ -21,8 +25,42 @@ public class CharacterAttack : MonoBehaviour
         characterData = GetComponent<ICharacterAnimatorData>();
     }
 
+    public void AddTargetLayer(string layerName)
+    {
+        int layer = LayerMask.NameToLayer(layerName);
+
+        if (layer != -1)
+        {
+            targetLayers |= (1 << layer);
+            Debug.Log("Layer added: " + layerName);
+        }
+        else
+        {
+            Debug.LogError("Invalid Layer Name: " + layerName);
+        }
+    }
+
+    public void RemoveTargetLayer(string layerName)
+    {
+        int layer = LayerMask.NameToLayer(layerName); 
+
+        if (layer != -1) 
+        {
+            targetLayers &= ~(1 << layer);
+            Debug.Log("Layer removed: " + layerName);
+        }
+        else
+        {
+            Debug.LogError("Invalid Layer Name: " + layerName);
+        }
+    }
+
     private void PerformAttack()
     {
+        if (characterStats == null) return;
+
+        int attackDamage = characterStats.GetCharacterData().attack.GetValue();
+
         Vector2 direction = spriteRenderer != null && spriteRenderer.flipX ? Vector2.left : Vector2.right;
         Vector2 attackPos = (Vector2)transform.position + new Vector2(attackOffset.x * direction.x, attackOffset.y);
 
@@ -48,6 +86,7 @@ public class CharacterAttack : MonoBehaviour
                 Debug.Log($"PerformAttack: hit {hit.name} has no Health component.");
             }
         }
+        Invoke("ResetAttackState", 0.1f);
     }
 
     public bool IsTargetInRange(Transform target)
@@ -65,9 +104,8 @@ public class CharacterAttack : MonoBehaviour
     {
         PerformAttack();
     }
+        
 
-
-    
     private void OnDrawGizmosSelected()
     {
         Vector2 direction = Application.isPlaying && spriteRenderer != null && spriteRenderer.flipX ? Vector2.left : Vector2.right;

@@ -13,6 +13,10 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     [SerializeField] private float groundCheckRadius = 0.15f;
     [SerializeField] private LayerMask groundLayer;
 
+    [Header("Attack Cooldown Settings")]
+    [SerializeField] private float baseAttackCooldown = 0.5f; 
+    private float attackCooldownTimer = 0f; 
+
     private bool isInBarrageMode = false;
 
     private Rigidbody2D rb;
@@ -20,6 +24,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     private InputSystem_Actions input;
     private CharacterAttack characterAttack;
     private AttackSequencer comboSystem;
+    private CharacterStats characterStats;
 
     public Vector2 MoveInput { get; private set; }
     public bool IsGrounded { get; private set; }
@@ -33,6 +38,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         col = GetComponent<Collider2D>();
         characterAttack = GetComponent<CharacterAttack>();
         comboSystem = GetComponent<AttackSequencer>();
+        characterStats = GetComponent<CharacterStats>();
 
         input = InputManager.GetInputActions();
         if (input == null)
@@ -62,6 +68,11 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     {
         MoveInput = input.Player.Move.ReadValue<Vector2>();
         IsGrounded = CheckGrounded();
+
+        if (attackCooldownTimer > 0f)
+        {
+            attackCooldownTimer -= Time.deltaTime;
+        }
     }
 
     private void FixedUpdate()
@@ -74,7 +85,11 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 
     public void HandleAttack(InputAction.CallbackContext context)
     {
-        comboSystem.HandleAttack();
+        if (attackCooldownTimer <= 0f)
+        {
+            comboSystem.HandleAttack();
+            attackCooldownTimer = CalculateAttackCooldown();
+        }
     }
 
     private void TriggerComboAttack(int comboIndex)
@@ -101,6 +116,14 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         RaycastHit2D hitRight = Physics2D.Raycast(origin + Vector2.right * 0.5f, direction, distance, groundLayer);
 
         return hitLeft.collider != null || hitRight.collider != null;
+    }
+
+    private float CalculateAttackCooldown()
+    {
+        float attackSpeed = characterStats.GetCharacterData().atkSpeed.GetValue();
+
+        float cooldown = baseAttackCooldown / (1f + (attackSpeed / 100f));  
+        return Mathf.Max(cooldown, 0.1f);
     }
 
     public void OnCharacterDeath()

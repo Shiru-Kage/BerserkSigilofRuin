@@ -61,9 +61,29 @@ public class RageSystem : MonoBehaviour
 
     private void CheckThresholds()
     {
-        if (rage >= rageMax)
+        if (rage >= rageMax) // 100% Rage
         {
             EnterBerserk();
+        }
+        else if (rage >= rageMax * 0.9f) // 90% Rage
+        {
+            ApplyMerits(90);
+            ApplyDemerits(90);
+        }
+        else if (rage >= rageMax * 0.75f) // 75% Rage
+        {
+            ApplyMerits(75);
+            ApplyDemerits(75);
+        }
+        else if (rage >= rageMax * 0.5f) // 50% Rage
+        {
+            ApplyMerits(50);
+            ApplyDemerits(50);
+        }
+        else if (rage >= rageMax * 0.25f) // 25% Rage
+        {
+            ApplyMerits(25);
+            ApplyDemerits(25);
         }
     }
 
@@ -127,5 +147,49 @@ public class RageSystem : MonoBehaviour
             combatTracker.NotifyCombatActivity();
 
         AddRage(rageIncreaseOnDamage);
+    }
+
+    private void ApplyMerits(float ragePercentage)
+    {
+        switch (ragePercentage)
+        {
+            case 25:
+                Debug.Log("25% Rage - Increased Attack Speed!");
+                break;
+
+            case 50:
+                Debug.Log("50% Rage - Increased Damage Output!");
+                break;
+
+            case 75:
+                Debug.Log("75% Rage - Increased Critical Chance!");
+                break;
+
+            case 90:
+                Debug.Log("90% Rage - Increased Strength but with limited control!");
+                break;
+        }
+    }
+
+    private void ApplyDemerits(float ragePercentage)
+    {
+        switch (ragePercentage)
+        {
+            case 25:
+                Debug.Log("25% Rage - Increased Attack Speed!");
+                break;
+
+            case 50:
+                Debug.Log("50% Rage - Increased Damage Output!");
+                break;
+
+            case 75:
+                Debug.Log("75% Rage - Increased Critical Chance!");
+                break;
+
+            case 90:
+                Debug.Log("90% Rage - Decreased Defense!");
+                break;
+        }
     }
 }

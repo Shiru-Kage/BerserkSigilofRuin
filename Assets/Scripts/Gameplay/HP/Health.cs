@@ -1,4 +1,3 @@
-using System.Security.AccessControl;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
@@ -6,11 +5,11 @@ using System.Collections;
 public class Health : MonoBehaviour
 {
     [Header("Health Settings")]
-    [SerializeField] private int maxHealth = 100;
+    [SerializeField] private CharacterStats characterStats;
     [SerializeField] private bool destroyOnDeath = true;
     [SerializeField] private float deathDelay = 1.0f;
 
-    public int MaxHealth => maxHealth;
+    public int MaxHealth => characterStats != null ? characterStats.GetCharacterData().maxHealth : 100;
     public int CurrentHealth { get; private set; }
     public bool IsDead => CurrentHealth <= 0;
 
@@ -29,17 +28,24 @@ public class Health : MonoBehaviour
 
     private void Awake()
     {
-        CurrentHealth = maxHealth;
+        if (characterStats != null)
+        {
+            characterStats.GetCharacterData().Initialize();
+            CurrentHealth = characterStats.GetCharacterData().currentHealth;
+        }
         _isDead = false;
 
         animatorData = GetComponent<ICharacterAnimatorData>();
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int attack)
     {
-        if (_isDead || amount <= 0) return;
+        if (_isDead || attack <= 0) return;
 
-        CurrentHealth -= amount;
+        int attackDamage = attack - characterStats.GetCharacterData().hp.GetValue(); // Subtract defense from attack eventually
+        attackDamage = Mathf.Clamp(attackDamage, 0, int.MaxValue);
+
+        CurrentHealth -= attack;
         if (CurrentHealth <= 0)
         {
             CurrentHealth = 0;
@@ -68,15 +74,15 @@ public class Health : MonoBehaviour
 
     public void Heal(int amount)
     {
-        if (_isDead || amount <= 0 || CurrentHealth >= maxHealth) return;
+        if (_isDead || amount <= 0 || CurrentHealth >= MaxHealth) return;
 
-        CurrentHealth = Mathf.Min(CurrentHealth + amount, maxHealth);
+        CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
     }
 
     public void RestoreFullHealth() //Future Implementation
     {
         if (!_isDead)
-            CurrentHealth = maxHealth;
+            CurrentHealth = MaxHealth;
     }
 
     public void StartHealthDrain(int drainAmount, float interval)
