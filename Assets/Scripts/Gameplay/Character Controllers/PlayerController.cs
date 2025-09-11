@@ -7,6 +7,9 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private float jumpForce = 12f;
+    [SerializeField] private float dashSpeed = 15f; 
+    [SerializeField] private float dashDuration = 0.2f;
+    [SerializeField] private float dashCooldown = 1f;
 
     [Header("Ground Check Settings")]
     [SerializeField] private Vector2 groundCheckOffset = new(0f, -0.6f);
@@ -16,7 +19,9 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     [Header("Attack Cooldown Settings")]
     [SerializeField] private float baseAttackCooldown = 0.5f; 
     private float attackCooldownTimer = 0f; 
-
+    private bool isDashing = false;
+    private float dashTimer = 0f;
+    private float dashCooldownTimer = 0f; 
     private bool isInBarrageMode = false;
 
     private Rigidbody2D rb;
@@ -25,6 +30,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     private CharacterAttack characterAttack;
     private AttackSequencer comboSystem;
     private CharacterStats characterStats;
+    private CharacterAnimator characterAnimator; 
 
     public Vector2 MoveInput { get; private set; }
     public bool IsGrounded { get; private set; }
@@ -39,6 +45,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         characterAttack = GetComponent<CharacterAttack>();
         comboSystem = GetComponent<AttackSequencer>();
         characterStats = GetComponent<CharacterStats>();
+        characterAnimator = GetComponent<CharacterAnimator>();
 
         input = InputManager.GetInputActions();
         if (input == null)
@@ -50,6 +57,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
 
         input.Player.Attack.performed += HandleAttack;
         input.Player.Jump.performed += HandleJump;
+        input.Player.Dash.performed += HandleDash;
 
         comboSystem.OnComboAttack += TriggerComboAttack;
 
@@ -60,6 +68,7 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
     {
         input.Player.Jump.performed -= HandleJump;
         input.Player.Attack.performed -= HandleAttack;
+        input.Player.Dash.performed -= HandleDash;
 
         comboSystem.OnComboAttack -= TriggerComboAttack;
     }
@@ -73,13 +82,43 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         {
             attackCooldownTimer -= Time.deltaTime;
         }
+
+        if (dashCooldownTimer > 0f) 
+        {
+            dashCooldownTimer -= Time.deltaTime;
+        }
+
+        if (isDashing)
+        {
+            dashTimer -= Time.deltaTime;
+            if (dashTimer <= 0f)
+            {
+                isDashing = false;
+            }
+        }
     }
 
     private void FixedUpdate()
     {
         if (!isInBarrageMode)
         {
-            rb.velocity = new Vector2(MoveInput.x * moveSpeed, rb.velocity.y);
+            if (!isDashing)
+            {
+                rb.velocity = new Vector2(MoveInput.x * moveSpeed, rb.velocity.y);
+            }
+            else
+            {
+                if (MoveInput != Vector2.zero)
+                {
+                    Vector2 dashDirection = new Vector2(MoveInput.x, MoveInput.y).normalized;
+                    rb.velocity = dashDirection * dashSpeed;
+                }
+                else
+                {
+                    Vector2 dashDirection = characterAnimator.IsFacingLeft() ? Vector2.left : Vector2.right;
+                    rb.velocity = dashDirection * dashSpeed;
+                }
+            }
         }
     }
 
@@ -102,6 +141,27 @@ public class PlayerController : MonoBehaviour, ICharacterAnimatorData
         if (!isInBarrageMode && IsGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        }
+    }
+
+    private void HandleDash(InputAction.CallbackContext context)
+    {
+        if (dashCooldownTimer <= 0f)
+        {
+            isDashing = true;
+            dashTimer = dashDuration;
+            dashCooldownTimer = dashCooldown;  
+
+            if (MoveInput != Vector2.zero)
+            {
+                Vector2 dashDirection = new Vector2(MoveInput.x, MoveInput.y).normalized;
+                rb.velocity = dashDirection * dashSpeed;
+            }
+            else
+            {
+                Vector2 dashDirection = characterAnimator.IsFacingLeft() ? Vector2.left : Vector2.right;
+                rb.velocity = dashDirection * dashSpeed;
+            }
         }
     }
 

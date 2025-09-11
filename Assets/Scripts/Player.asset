@@ -17,9 +17,9 @@ MonoBehaviour:
   hp:
     baseValue: 0
   attack:
-    baseValue: 10
+    baseValue: 1
   atkSpeed:
-    baseValue: 10
+    baseValue: 1
   defense:
     baseValue: 0
   speed:

@@ -111,6 +111,10 @@ public class CharacterAnimator : MonoBehaviour
             data.OnAttack += onAttackAction;
         }
     }
+    public bool IsFacingLeft()
+    {
+        return spriteRenderer.flipX;
+    }
 }
 public static class AnimatorExtensions
 {
