@@ -4,7 +4,6 @@ using UnityEngine.UI;
 public class RageUI : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private RageSystem rageSystem;
     [SerializeField] private Image rageFillImage;
 
     [Header("Smooth Fill")]
@@ -15,13 +14,13 @@ public class RageUI : MonoBehaviour
         if (rageFillImage == null)
             Debug.LogError("RageFillImage reference missing!");
 
-        if (rageSystem == null)
+        if (RageSystem.Instance == null)
             Debug.LogError("RageSystem reference missing!");
     }
 
     private void Update()
     {
-        float targetFill = rageSystem.CurrentRage / rageSystem.MaxRage;
+        float targetFill = RageSystem.Instance.CurrentRage / RageSystem.Instance.MaxRage;
         rageFillImage.fillAmount = Mathf.Lerp(rageFillImage.fillAmount, targetFill, fillSpeed * Time.deltaTime);
     }
 }

@@ -8,6 +8,7 @@ public class CharacterAttack : MonoBehaviour
     [Header("Attack Settings")]
     [SerializeField] private CharacterStats characterStats;
     [SerializeField] private float attackRange = 0.5f;
+    [SerializeField] private float attackWidth = 1f;
     [SerializeField] private Vector2 attackOffset = new Vector2(0.5f, 0f);
     [SerializeField] private LayerMask targetLayers;
     private SpriteRenderer spriteRenderer;
@@ -64,7 +65,9 @@ public class CharacterAttack : MonoBehaviour
         Vector2 direction = spriteRenderer != null && spriteRenderer.flipX ? Vector2.left : Vector2.right;
         Vector2 attackPos = (Vector2)transform.position + new Vector2(attackOffset.x * direction.x, attackOffset.y);
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(attackPos, attackRange, targetLayers);
+        Vector2 boxSize = new Vector2(attackWidth, attackRange);
+        Collider2D[] hits = Physics2D.OverlapBoxAll(attackPos, boxSize, 0f, targetLayers);
+
         foreach (var hit in hits)
         {
             if (hit.TryGetComponent(out Health health))
@@ -96,8 +99,8 @@ public class CharacterAttack : MonoBehaviour
         Vector2 direction = spriteRenderer != null && spriteRenderer.flipX ? Vector2.left : Vector2.right;
         Vector2 attackPos = (Vector2)transform.position + new Vector2(attackOffset.x * direction.x, attackOffset.y);
 
-        float distance = Vector2.Distance(attackPos, target.position);
-        return distance <= attackRange;
+        Vector2 boxSize = new Vector2(attackWidth, attackRange);
+        return Physics2D.OverlapBox(attackPos, boxSize, 0f, targetLayers) != null;
     }
 
     public void ForceAttackNow()
@@ -112,6 +115,6 @@ public class CharacterAttack : MonoBehaviour
         Vector2 attackPos = (Vector2)transform.position + new Vector2(attackOffset.x * direction.x, attackOffset.y);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(attackPos, attackRange);
+        Gizmos.DrawWireCube(attackPos, new Vector2(attackWidth, attackRange));
     }
 }

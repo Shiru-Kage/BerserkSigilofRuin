@@ -12,7 +12,11 @@ public class PlayerDetector : MonoBehaviour
 
     private Transform lastSeenTarget;
     private float loseTimer;
-
+    private SpriteRenderer spriteRenderer;
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
     public Transform GetTarget(Vector2 fallbackDirection)
     {
         Vector2 origin = (Vector2)transform.position + detectionRayOffset;
@@ -27,6 +31,14 @@ public class PlayerDetector : MonoBehaviour
         {
             lastSeenTarget = hit.transform;
             loseTimer = loseInterestDelay;
+            if (lastSeenTarget.position.x > transform.position.x)
+            {
+                spriteRenderer.flipX = false;
+            }
+            else
+            {
+                spriteRenderer.flipX = true;
+            }
         }
         else
         {

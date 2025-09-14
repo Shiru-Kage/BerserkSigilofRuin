@@ -3,6 +3,8 @@ using UnityEngine.Events;
 
 public class RageSystem : MonoBehaviour
 {
+    public static RageSystem Instance { get; private set; }
+
     [Header("Rage Settings")]
     [SerializeField] private float rage = 0f;
     [SerializeField] private float rageMax = 100f;
@@ -29,6 +31,16 @@ public class RageSystem : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
         if (playerController == null)
             playerController = GetComponent<PlayerController>();
 

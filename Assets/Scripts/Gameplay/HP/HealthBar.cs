@@ -3,11 +3,10 @@ using UnityEngine.UI;
 
 public class HealthBarUI : MonoBehaviour
 {
-    [SerializeField] private Health health;
-
     [Header("UI Images")]
     [SerializeField] private Image mainFillImage;
     [SerializeField] private Image delayedFillImage; 
+    private Health health;
 
     [Header("Damage Lag Settings")]
     [SerializeField] private float delayBeforeDrain = 0.5f;
@@ -18,6 +17,7 @@ public class HealthBarUI : MonoBehaviour
 
     private void Start()
     {
+        health = GlobalManager.Instance.player.GetComponent<Health>();
         if (health == null || mainFillImage == null || delayedFillImage == null) return;
 
         UpdateBarImmediate();
